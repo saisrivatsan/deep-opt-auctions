@@ -14,12 +14,12 @@ class Trainer(BaseTrainer):
         super(Trainer, self).__init__(config, mode)
         self.build_model()
 
-    def init_generators(self):
+    def init_generators(self, X = None, ADV = None):
         if self.mode is "train":
-            self.train_gen = Generator(self.config, 'train')
-            self.val_gen = Generator(self.config, 'val')
+            self.train_gen = Generator(self.config, 'train', X = X, ADV = ADV)
+            self.val_gen = Generator(self.config, 'val', X = X, ADV = ADV)
         else:
-            self.test_gen = Generator(self.config, 'test')
+            self.test_gen = Generator(self.config, 'test', X = X)
 
     def init_net(self):
         self.net = Net(self.config)

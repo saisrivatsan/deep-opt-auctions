@@ -1,0 +1,3 @@
+2019-01-18 02:36:40,091:INFO:TRAIN-BATCH Iter: 1000, t = 74.4793, Revenue: 5.303678, Regret: 0.010857, Reg_Loss: 0.000192, Lag_Loss: 0.189074, Net_Loss: -5.114412, w_rgt_mean: 5.795133, update_rate: 1.000000
+2019-01-18 02:37:52,381:INFO:TRAIN-BATCH Iter: 2000, t = 146.6721, Revenue: 5.235944, Regret: 0.011563, Reg_Loss: 0.000210, Lag_Loss: 0.205251, Net_Loss: -5.030483, w_rgt_mean: 5.918382, update_rate: 1.000000
+2019-01-18 02:39:05,829:INFO:TRAIN-BATCH Iter: 3000, t = 220.0336, Revenue: 5.254143, Regret: 0.016167, Reg_Loss: 0.000417, Lag_Loss: 0.293332, Net_Loss: -4.960394, w_rgt_mean: 6.044223, update_rate: 1.000000

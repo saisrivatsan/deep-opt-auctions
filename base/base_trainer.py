@@ -234,14 +234,17 @@ class BaseTrainer(object):
         # Init TF-graph
         self.init_graph()
 
-        # Init generators
-        self.init_generators()   
+           
 
 
     def train(self):
         """
         Runs training
         """
+        
+        # Init generators
+        self.init_generators()
+        
         iter = self.config.train.restore_iter
         sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -330,6 +333,9 @@ class BaseTrainer(object):
         """
         Runs test
         """
+        
+        # Init generators
+        self.init_generators(X = X_tst, ADV = ADV_tst)
 
         iter = self.config.test.restore_iter
         sess = tf.InteractiveSession()

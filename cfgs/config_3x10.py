@@ -12,23 +12,25 @@ __C = edict()
 
 cfg = __C
 
-__C.dir_name = os.path.join("1x2","1x2_up_add_10.0")
-__C.num_agents = 1
-__C.num_items = 2
+__C.dir_name = "3x10_l6_10k_up_add_1.0"
+__C.num_agents = 3
+__C.num_items = 10
+__C.save_data = False
 
 # Neural Net parameters
 __C.net = edict()
 __C.net.init = "gu"
 __C.net.activation = "tanh"
-__C.net.num_a_layers = 3
-__C.net.num_p_layers = 3
+__C.net.num_a_layers = 6
+__C.net.num_p_layers = 6
 __C.net.num_p_hidden_units = 100
 __C.net.num_a_hidden_units = 100
 
 # Train paramters
 __C.train = edict()
 
-__C.train.up_op_add = 10.0
+__C.train.up_op_add = 1.0
+__C.train.up_op_frequency = 10000
 __C.train.seed = 42
 __C.train.restore_iter = 0
 __C.train.num_misreports = 1

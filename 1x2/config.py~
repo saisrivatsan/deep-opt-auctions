@@ -12,7 +12,7 @@ __C = edict()
 
 cfg = __C
 
-__C.dir_name = os.path.join("1x2","1x2_up_add_10.0")
+__C.dir_name = "1x2_up_add_10.0"
 __C.num_agents = 1
 __C.num_items = 2
 

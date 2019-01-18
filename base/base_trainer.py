@@ -317,7 +317,7 @@ class BaseTrainer(object):
                     for k in range(self.config.val.gd_iter):
                         sess.run(self.val_mis_step, feed_dict = {self.x: X})
                         sess.run(self.clip_op)
-                    sess.run(self.val_reset_opt)                                   
+                    sess.run(self.reset_val_mis_opt)                                   
                     metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
                     metric_tot += metric_vals
                     
@@ -358,7 +358,7 @@ class BaseTrainer(object):
                 sess.run(self.test_mis_step, feed_dict = {self.x: X})
                 sess.run(self.clip_op)
 
-            sess.run(self.test_reset_opt)        
+            sess.run(self.reset_test_mis_opt)        
                 
             metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
             

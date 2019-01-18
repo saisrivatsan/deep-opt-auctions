@@ -111,10 +111,10 @@ class BaseTrainer(object):
         x_mis, misreports = self.get_misreports(self.x, self.adv_var, adv_shape)
         
         # Get mechanism for true valuation: Allocation and Payment
-        self.alloc, self.pay = self.net.forward(self.x)
+        self.alloc, self.pay = self.net.inference(self.x)
         
         # Get mechanism for misreports: Allocation and Payment
-        a_mis, p_mis = self.net.forward(misreports)
+        a_mis, p_mis = self.net.inference(misreports)
         
         # Utility
         utility = self.compute_utility(self.x, self.alloc, self.pay)
@@ -147,7 +147,7 @@ class BaseTrainer(object):
 
 
             update_rate = tf.Variable(self.config.train.update_rate, trainable = False)
-            self.up_op = update_rate.assign(update_rate + self.config.train.up_op_add)
+            self.increment_update_rate = update_rate.assign(update_rate + self.config.train.up_op_add)
 
       
             # Loss Functions
@@ -174,17 +174,17 @@ class BaseTrainer(object):
 
 
             # Train ops
-            self.train_step_1  = opt_1.minimize(loss_1, var_list = var_list)
-            self.train_gd_step = opt_2.minimize(loss_2, var_list = [self.adv_var])
-            self.lag_update    = opt_3.minimize(loss_3, var_list = [self.w_rgt])
+            self.train_op  = opt_1.minimize(loss_1, var_list = var_list)
+            self.train_mis_step = opt_2.minimize(loss_2, var_list = [self.adv_var])
+            self.lagrange_update    = opt_3.minimize(loss_3, var_list = [self.w_rgt])
             
             # Val ops
-            val_opt = tf.train.AdamOptimizer(self.config.val.gd_lr)
-            self.val_gd_step = val_opt.minimize(loss_2, var_list = [self.adv_var])       
+            val_mis_opt = tf.train.AdamOptimizer(self.config.val.gd_lr)
+            self.val_mis_step = val_mis_opt.minimize(loss_2, var_list = [self.adv_var])       
 
             # Reset ops
-            self.train_reset_opt = tf.variables_initializer(opt_2.variables()) 
-            self.val_reset_opt = tf.variables_initializer(val_opt.variables())
+            self.reset_train_mis_opt = tf.variables_initializer(opt_2.variables()) 
+            self.reset_val_mis_opt = tf.variables_initializer(val_mis_opt.variables())
 
             # Metrics
             self.metrics = [revenue, rgt_mean, rgt_penalty, lag_loss, loss_1, tf.reduce_mean(self.w_rgt), update_rate]
@@ -205,9 +205,9 @@ class BaseTrainer(object):
         elif self.mode is "test":
 
             loss = -tf.reduce_sum(u_mis)
-            opt = tf.train.AdamOptimizer(self.config.test.gd_lr)
-            self.test_gd_step = opt.minimize(loss, var_list = [self.adv_var])
-            self.test_reset_opt = tf.variables_initializer(opt.variables())
+            test_mis_opt = tf.train.AdamOptimizer(self.config.test.gd_lr)
+            self.test_mis_step = test_mis_opt.minimize(loss, var_list = [self.adv_var])
+            self.reset_test_mis_opt = tf.variables_initializer(test_mis_opt.variables())
 
             # Metrics
             self.metrics = [revenue, rgt_mean, irp_mean]
@@ -239,7 +239,9 @@ class BaseTrainer(object):
 
 
     def train(self):
-
+        """
+        Runs training
+        """
         iter = self.config.train.restore_iter
         sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -258,7 +260,7 @@ class BaseTrainer(object):
             # Get a mini-batch
             X, ADV, perm = next(self.train_gen.gen_func)
                 
-            if iter == 0: sess.run(self.lag_update, feed_dict = {self.x : X})
+            if iter == 0: sess.run(self.lagrange_update, feed_dict = {self.x : X})
  
 
             tic = time.time()    
@@ -266,15 +268,15 @@ class BaseTrainer(object):
             # Get Best Mis-report
             sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})                                        
             for _ in range(self.config.train.gd_iter):
-                sess.run(self.train_gd_step, feed_dict = {self.x: X})
+                sess.run(self.train_mis_step, feed_dict = {self.x: X})
                 sess.run(self.clip_op)
-            sess.run(self.train_reset_opt)
+            sess.run(self.reset_train_mis_opt)
 
             if self.config.train.data is "fixed" and self.config.train.adv_reuse:
                 self.train_gen.update_adv(perm, sess.run(self.adv_var))
 
             # Update network params
-            sess.run(self.train_step_1, feed_dict = {self.x: X})
+            sess.run(self.train_op, feed_dict = {self.x: X})
                 
             if iter==0:
                 summary = sess.run(self.merged, feed_dict = {self.x: X})
@@ -284,11 +286,11 @@ class BaseTrainer(object):
 
             # Run Lagrange Update
             if iter % self.config.train.update_frequency == 0:
-                sess.run(self.lag_update, feed_dict = {self.x:X})
+                sess.run(self.lagrange_update, feed_dict = {self.x:X})
                 
 
             if iter % self.config.train.up_op_frequency == 0:
-                sess.run(self.up_op)
+                sess.run(self.increment_update_rate)
 
             toc = time.time()
             time_elapsed += (toc - tic)
@@ -313,7 +315,7 @@ class BaseTrainer(object):
                     X, ADV, _ = next(self.val_gen.gen_func) 
                     sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})               
                     for k in range(self.config.val.gd_iter):
-                        sess.run(self.val_gd_step, feed_dict = {self.x: X})
+                        sess.run(self.val_mis_step, feed_dict = {self.x: X})
                         sess.run(self.clip_op)
                     sess.run(self.val_reset_opt)                                   
                     metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
@@ -325,6 +327,9 @@ class BaseTrainer(object):
                 self.logger.info(log_str)
 
     def test(self, X_tst = None, ADV_tst = None):
+        """
+        Runs test
+        """
 
         iter = self.config.test.restore_iter
         sess = tf.InteractiveSession()
@@ -350,7 +355,7 @@ class BaseTrainer(object):
             sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})
                     
             for k in range(self.config.test.gd_iter):
-                sess.run(self.test_gd_step, feed_dict = {self.x: X})
+                sess.run(self.test_mis_step, feed_dict = {self.x: X})
                 sess.run(self.clip_op)
 
             sess.run(self.test_reset_opt)        

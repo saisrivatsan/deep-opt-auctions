@@ -92,7 +92,10 @@ class Net(BaseNet):
             wname = "b_p_" + str(num_p_layers - 1)   
             self.b_p.append(create_var(wname, [num_agents], initializer = b_init))
             
-    def forward(self, x):
+    def inference(self, x):
+        """
+        Inference
+        """
         
  
         x_in = tf.reshape(x, [-1, self.config.num_agents * self.config.num_items])

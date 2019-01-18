@@ -79,9 +79,7 @@ class BaseNet(object):
         """
         raise NotImplementedError
         
-        
-
-    def forward(self, x):
+    def inference(self, x):
         """ 
         Inference 
         """

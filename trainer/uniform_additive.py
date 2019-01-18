@@ -15,7 +15,6 @@ class Trainer(BaseTrainer):
         self.build_model()
 
     def init_generators(self):
-        # Data generators
         if self.mode is "train":
             self.train_gen = Generator(self.config, 'train')
             self.val_gen = Generator(self.config, 'val')

@@ -10,10 +10,10 @@ from base.base_net import *
 class Net(BaseNet):
 
     def __init__(self, config):
-        super(Net, self).__init__(sess, config)
-        self.nn_build()
+        super(Net, self).__init__(config)
+        self.build_net()
 
-    def nn_build(self):
+    def build_net(self):
         """
         Initializes network variables
         """
@@ -98,34 +98,34 @@ class Net(BaseNet):
         # Allocation Network
         a = tf.matmul(x_in, self.w_a[0]) + self.b_a[0]
         a = self.activation(a, 'alloc_act_0')
-        _activation_summary(a)
+        activation_summary(a)
         
         for i in range(1, self.config.net.num_a_layers - 1):
             a = tf.matmul(a, self.w_a[i]) + self.b_a[i]
             a = self.activation(a, 'alloc_act_' + str(i))                    
-            _activation_summary(a)
+            activation_summary(a)
 
         a = tf.matmul(a, self.w_a[-1]) + self.b_a[-1]
         a = tf.nn.softmax(tf.reshape(a, [-1, self.config.num_agents + 1, self.config.num_items + 1]), axis = 1)
         a = tf.slice(a, [0,0,0], size=[-1, self.config.num_agents, self.config.num_items], name = 'alloc_out')
-        _activation_summary(a)
+        activation_summary(a)
 
         # Payment Network
         p = tf.matmul(x_in, self.w_p[0]) + self.b_p[0]
         p = self.activation(p, 'pay_act_0')                  
-        _activation_summary(p)
+        activation_summary(p)
 
         for i in range(1, self.config.net.num_p_layers - 1):
             p = tf.matmul(p, self.w_p[i]) + self.b_p[i]
             p = self.activation(p, 'pay_act_' + str(i))                  
-            _activation_summary(p)
+            activation_summary(p)
 
         p = tf.matmul(p, self.w_p[-1]) + self.b_p[-1]
         p = tf.sigmoid(p, 'pay_sigmoid')
-        _activation_summary(p)
+        activation_summary(p)
         
         u = tf.reduce_sum(a * tf.reshape(x, [-1, self.config.num_agents, self.config.num_items]), axis = -1)
         p = p * u
-        _activation_summary(p)
+        activation_summary(p)
         
         return a, p

@@ -5,11 +5,12 @@ from __future__ import print_function
 import numpy as np
 class Generator(BaseGenerator):
 
-    def __init__(self, config):
-        super(Generator, self).__init__(sess, config)
+    def __init__(self, config, mode):
+        super(Generator, self).__init__(config, mode)
+        self.build_generator()
 
-    def generate_random_X(shape):
+    def generate_random_X(self, shape):
         return np.random.rand(*shape) + 2.0
 
-    def generate_random_ADV(shape):
+    def generate_random_ADV(self, shape):
         return np.random.rand(*shape) + 2.0

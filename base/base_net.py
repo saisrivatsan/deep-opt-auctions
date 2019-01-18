@@ -43,7 +43,7 @@ def create_var(name, shape, dtype = tf.float32, initializer = None, wd = None, s
     return var
 
 
-def _activation_summary(x):
+def activation_summary(x):
     """ 
     Helper to create summaries for activations.
     Creates a summary that provides a histogram of activations.
@@ -71,13 +71,9 @@ class BaseNet(object):
         
         if self.config.net.activation == 'tanh': activation = lambda *x: tf.tanh(*x)
         elif self.config.net.activation == 'relu': activation = lambda *x: tf.nn.relu(*x)
-        self.activation = activation
-        
-        """ Init network variables """
-        self.nn_build()
-        
+        self.activation = activation        
                
-    def nn_build(self):
+    def build_net(self):
         """
         Initializes network variables
         """

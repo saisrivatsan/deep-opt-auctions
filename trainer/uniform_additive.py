@@ -3,14 +3,16 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow as tf
 
+from nets.additive_net import Net
+from base.base_trainer import BaseTrainer
 from data.uniform_01_generator import Generator
-from nets.addtive_net import Net
-
 
 class Trainer(BaseTrainer):
-	def __init__(self, config):
+    def __init__(self, config, mode):
         super(Trainer, self).__init__(config, mode)
+        self.build_model()
 
     def init_generators(self):
         # Data generators
@@ -21,7 +23,7 @@ class Trainer(BaseTrainer):
             self.test_gen = Generator(self.config, 'test')
 
     def init_net(self):
-        self.net = Net(config)
+        self.net = Net(self.config)
 
-    def clip_op(self)
-        return tf.assign(self.adv_var, tf.clip_by_value(adv_var, 0.0, 1.0))
+    def get_clip_op(self):
+        return tf.assign(self.adv_var, tf.clip_by_value(self.adv_var, 0.0, 1.0))

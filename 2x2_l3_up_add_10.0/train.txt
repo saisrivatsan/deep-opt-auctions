@@ -1,0 +1,6 @@
+2019-01-17 22:36:41,715:INFO:TRAIN-BATCH Iter: 1000, t = 63.1195, Revenue: 0.822376, Regret: 0.004152, Reg_Loss: 0.000019, Lag_Loss: 0.043303, Net_Loss: -0.779054, w_rgt_mean: 5.219557, update_rate: 1.000000
+2019-01-17 22:37:45,079:INFO:TRAIN-BATCH Iter: 2000, t = 126.4258, Revenue: 0.917265, Regret: 0.003248, Reg_Loss: 0.000011, Lag_Loss: 0.034151, Net_Loss: -0.883102, w_rgt_mean: 5.261119, update_rate: 1.000000
+2019-01-17 22:38:48,283:INFO:TRAIN-BATCH Iter: 3000, t = 189.5768, Revenue: 0.905965, Regret: 0.005266, Reg_Loss: 0.000029, Lag_Loss: 0.055819, Net_Loss: -0.850117, w_rgt_mean: 5.301884, update_rate: 1.000000
+2019-01-17 22:39:51,626:INFO:TRAIN-BATCH Iter: 4000, t = 252.8644, Revenue: 0.934338, Regret: 0.004326, Reg_Loss: 0.000020, Lag_Loss: 0.046190, Net_Loss: -0.888128, w_rgt_mean: 5.341372, update_rate: 1.000000
+2019-01-17 22:40:56,012:INFO:TRAIN-BATCH Iter: 5000, t = 317.1971, Revenue: 0.921560, Regret: 0.005720, Reg_Loss: 0.000035, Lag_Loss: 0.061522, Net_Loss: -0.860003, w_rgt_mean: 5.380431, update_rate: 1.000000
+2019-01-17 22:42:01,489:INFO:TRAIN-BATCH Iter: 6000, t = 382.6060, Revenue: 0.901394, Regret: 0.004564, Reg_Loss: 0.000021, Lag_Loss: 0.049497, Net_Loss: -0.851876, w_rgt_mean: 5.422373, update_rate: 1.000000

@@ -9,15 +9,16 @@ import numpy as np
 class BaseGenerator(object):
     def __init__(self, config, mode = "train"):    
         self.config = config
+        self.mode = mode
         self.num_agents = config.num_agents
         self.num_items = config.num_items
-        self.num_instances = config[mode].num_batches * config[mode].batch_size
-        self.num_misreports = config[mode].num_misreports
-        self.batch_size = config[mode].batch_size
-        self.mode = mode
+        self.num_instances = config[self.mode].num_batches * config[self.mode].batch_size
+        self.num_misreports = config[self.mode].num_misreports
+        self.batch_size = config[self.mode].batch_size
+        
                        
-    def generator_build(self, X = None, ADV = None):
-        if mode is "train":            
+    def build_generator(self, X = None, ADV = None):
+        if self.mode is "train":            
             if self.config.train.data is "fixed":
                 if self.config.train.restore_iter == 0:
                     self.get_data(X, ADV)
@@ -28,7 +29,7 @@ class BaseGenerator(object):
                 self.gen_func = self.gen_online()
                 
         else:
-            if self.config[mode].data is "fixed":
+            if self.config[self.mode].data is "fixed":
                 self.get_data(X, ADV)
                 self.gen_func = self.gen_fixed()
             else:
@@ -88,10 +89,10 @@ class BaseGenerator(object):
         self.ADV[:, idx, :, :] = adv_new
 
 
-    def generate_random_X(shape):
+    def generate_random_X(self, shape):
         """ Rewrite this for new distributions """
         raise NotImplementedError
 
-    def generate_random_ADV(shape):
+    def generate_random_ADV(self, shape):
         """ Rewrite this for new distributions """
         raise NotImplementedError

@@ -11,7 +11,7 @@ class Generator(BaseGenerator):
         self.build_generator(X = X, ADV = ADV)
 
     def generate_random_X(self, shape):
-        return np.random.rand(*shape)
+        return np.random.rand(*shape) + 1.0
 
     def generate_random_ADV(self, shape):
-        return np.random.rand(*shape)
+        return np.random.rand(*shape) + 1.0

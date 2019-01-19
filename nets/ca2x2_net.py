@@ -91,7 +91,6 @@ class Net(BaseNet):
 
         with tf.variable_scope("pay"):
             
-            with tf.variable_scope("pay"):
             # Input Layer
             self.w_p.append(create_var("w_p_0", [num_in, num_p_hidden_units], initializer = w_init, wd = wd))
 
@@ -142,7 +141,7 @@ class Net(BaseNet):
         a_agent1 = tf.minimum(a_agent1_, a_agent1_bundle)
         a_agent2 = tf.minimum(a_agent2_, a_agent2_bundle)
         
-        a = tf.reshape(tf.concat([a_agent1, a_agent2], axis = 1), [-1, self.config.num_agents, 3])
+        a = tf.reshape(tf.concat([a_agent1, a_agent2], axis = 1), [-1, 2, 3])
         # Zhe's code End
 
         activation_summary(a)

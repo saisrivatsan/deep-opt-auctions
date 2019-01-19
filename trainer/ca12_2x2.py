@@ -10,18 +10,41 @@ import numpy as np
 import tensorflow as tf
 
 
-class BaseTrainer(object):
+class Trainer(object):
 
-    def __init__(self, config, mode):
+    def __init__(self, config, mode, net, clip_op_lambda):
         self.config = config
         self.mode = mode
+        
+        # Create output-dir
+        if not os.path.exists(self.config.dir_name): os.mkdir(self.config.dir_name)
 
         if self.mode == "train":
             log_suffix = '_' + str(self.config.train.restore_iter) if self.config.train.restore_iter > 0 else ''
             self.log_fname = os.path.join(self.config.dir_name, 'train' + log_suffix + '.txt')
         else:
             log_suffix = "_iter_" + str(self.config.test.restore_iter) + "_m_" + str(self.config.test.num_misreports) + "_gd_" + str(self.config.test.gd_iter)
-            self.log_fname = os.path.join(self.config.dir_name, "test" + log_suffix + ".txt")   
+            self.log_fname = os.path.join(self.config.dir_name, "test" + log_suffix + ".txt")
+            
+        # Set Seeds for reproducibility
+        np.random.seed(self.config[self.mode].seed)
+        tf.set_random_seed(self.config[self.mode].seed)
+        
+        # Init Logger
+        self.init_logger()
+
+        # Init Net
+        self.net = net
+        
+        ## Clip Op
+        self.clip_op_lambda = clip_op_lambda
+        
+        # Init TF-graph
+        self.init_graph()
+        
+    def get_clip_op(self, adv_var):
+        self.clip_op =  self.clip_op_lambda(adv_var)
+        #tf.assign(adv_var, tf.clip_by_value(adv_var, 0.0, 1.0))
         
 
     def init_logger(self):
@@ -75,26 +98,17 @@ class BaseTrainer(object):
         misreports = tf.reshape(y, [-1, self.config.num_agents, self.config.num_items])
         return x_mis, misreports
 
-    
-    def init_generators(self):
-        raise NotImplementedError
-
-    def init_net(self):
-        raise NotImplementedError
-
-    def get_clip_op(self):
-        raise NotImplementedError
-
-
     def init_graph(self):
        
         x_shape = [self.config[self.mode].batch_size, self.config.num_agents, self.config.num_items]
+        c_shape = [self.config[self.mode].batch_size, self.config.num_agents]
         adv_shape = [self.config.num_agents, self.config[self.mode].num_misreports, self.config[self.mode].batch_size, self.config.num_agents, self.config.num_items]
         adv_var_shape = [ self.config[self.mode].num_misreports, self.config[self.mode].batch_size, self.config.num_agents, self.config.num_items]
         u_shape = [self.config.num_agents, self.config[self.mode].num_misreports, self.config[self.mode].batch_size, self.config.num_agents]
 
         # Placeholders
         self.x = tf.placeholder(tf.float32, shape=x_shape, name='x')
+        self.c = tf.placeholder(tf.float32, shape=c_shape, name='c')
         self.adv_init = tf.placeholder(tf.float32, shape=adv_var_shape, name='adv_init')
         
         self.adv_mask = np.zeros(adv_shape)
@@ -110,15 +124,27 @@ class BaseTrainer(object):
         # Misreports
         x_mis, misreports = self.get_misreports(self.x, self.adv_var, adv_shape)
         
+        
+
+        # Input shapes for NNs
+        x_bundle = tf.expand_dims(tf.reduce_sum(self.x, axis = -1) + self.c, -1)
+        x_in = tf.concat([self.x, x_bundle], axis = -1)
+        
+        x_mis_in = tf.tile(x_in, [self.config.num_agents * self.config[self.mode].num_misreports, 1, 1])
+        
+        c_mis = tf.tile(self.c, [self.config.num_agents * self.config[self.mode].num_misreports, 1])
+        mis_bundle = tf.expand_dims(tf.reduce_sum(misreports, axis = -1) + c_mis, -1)
+        mis_in = tf.concat([misreports, mis_bundle], axis = -1)
+        
         # Get mechanism for true valuation: Allocation and Payment
-        self.alloc, self.pay = self.net.inference(self.x)
+        self.alloc, self.pay = self.net.inference(x_in)
         
         # Get mechanism for misreports: Allocation and Payment
-        a_mis, p_mis = self.net.inference(misreports)
+        a_mis, p_mis = self.net.inference(mis_in)
         
         # Utility
-        utility = self.compute_utility(self.x, self.alloc, self.pay)
-        utility_mis = self.compute_utility(x_mis, a_mis, p_mis)
+        utility = self.compute_utility(x_in, self.alloc, self.pay)
+        utility_mis = self.compute_utility(x_mis_in, a_mis, p_mis)
         
         # Regret Computation
         u_mis = tf.reshape(utility_mis, u_shape) * self.u_mask
@@ -217,33 +243,14 @@ class BaseTrainer(object):
 
         # Helper ops post GD steps
         self.assign_op = tf.assign(self.adv_var, self.adv_init)
-        self.clip_op = self.get_clip_op()
+        self.get_clip_op(self.adv_var)
         
-    def build_model(self):
-
-        # Set Seeds for reproducibility
-        np.random.seed(self.config[self.mode].seed)
-        tf.set_random_seed(self.config[self.mode].seed)
-        
-        # Init Logger
-        self.init_logger()
-
-        # Init Net
-        self.init_net()
-
-        # Init TF-graph
-        self.init_graph()
-
-           
-
-
-    def train(self):
+    def train(self, generator):
         """
         Runs training
         """
         
-        # Init generators
-        self.init_generators()
+        self.train_gen, self.val_gen = generator
         
         iter = self.config.train.restore_iter
         sess = tf.InteractiveSession()
@@ -261,9 +268,9 @@ class BaseTrainer(object):
         while iter < (self.config.train.max_iter):
              
             # Get a mini-batch
-            X, ADV, perm = next(self.train_gen.gen_func)
+            X, ADV, C, perm = next(self.train_gen.gen_func)
                 
-            if iter == 0: sess.run(self.lagrange_update, feed_dict = {self.x : X})
+            if iter == 0: sess.run(self.lagrange_update, feed_dict = {self.x: X, self.c: C})
  
 
             tic = time.time()    
@@ -271,7 +278,7 @@ class BaseTrainer(object):
             # Get Best Mis-report
             sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})                                        
             for _ in range(self.config.train.gd_iter):
-                sess.run(self.train_mis_step, feed_dict = {self.x: X})
+                sess.run(self.train_mis_step, feed_dict = {self.x: X, self.c: C})
                 sess.run(self.clip_op)
             sess.run(self.reset_train_mis_opt)
 
@@ -279,17 +286,17 @@ class BaseTrainer(object):
                 self.train_gen.update_adv(perm, sess.run(self.adv_var))
 
             # Update network params
-            sess.run(self.train_op, feed_dict = {self.x: X})
+            sess.run(self.train_op, feed_dict = {self.x: X, self.c: C})
                 
             if iter==0:
-                summary = sess.run(self.merged, feed_dict = {self.x: X})
+                summary = sess.run(self.merged, feed_dict = {self.x: X, self.c: C})
                 train_writer.add_summary(summary, iter) 
 
             iter += 1
 
             # Run Lagrange Update
             if iter % self.config.train.update_frequency == 0:
-                sess.run(self.lagrange_update, feed_dict = {self.x:X})
+                sess.run(self.lagrange_update, feed_dict = {self.x: X, self.c: C})
                 
 
             if iter % self.config.train.up_op_frequency == 0:
@@ -304,9 +311,9 @@ class BaseTrainer(object):
 
             if (iter % self.config.train.print_iter) == 0:
                 # Train Set Stats
-                summary = sess.run(self.merged, feed_dict = {self.x: X})
+                summary = sess.run(self.merged, feed_dict = {self.x: X, self.c: C})
                 train_writer.add_summary(summary, iter)
-                metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
+                metric_vals = sess.run(self.metrics, feed_dict = {self.x: X, self.c: C})
                 fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_vals) for item in tup ])
                 log_str = "TRAIN-BATCH Iter: %d, t = %.4f"%(iter, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
                 self.logger.info(log_str)
@@ -315,13 +322,13 @@ class BaseTrainer(object):
                 #Validation Set Stats
                 metric_tot = np.zeros(len(self.metric_names))         
                 for _ in range(self.config.val.num_batches):
-                    X, ADV, _ = next(self.val_gen.gen_func) 
+                    X, ADV, C, _ = next(self.val_gen.gen_func) 
                     sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})               
                     for k in range(self.config.val.gd_iter):
-                        sess.run(self.val_mis_step, feed_dict = {self.x: X})
+                        sess.run(self.val_mis_step, feed_dict = {self.x: X, self.c: C})
                         sess.run(self.clip_op)
                     sess.run(self.reset_val_mis_opt)                                   
-                    metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
+                    metric_vals = sess.run(self.metrics, feed_dict = {self.x: X, self.c: C})
                     metric_tot += metric_vals
                     
                 metric_tot = metric_tot/self.config.val.num_batches
@@ -329,13 +336,13 @@ class BaseTrainer(object):
                 log_str = "VAL-%d"%(iter) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
                 self.logger.info(log_str)
 
-    def test(self, X_tst = None, ADV_tst = None):
+    def test(self, generator):
         """
         Runs test
         """
         
         # Init generators
-        self.init_generators(X = X_tst, ADV = ADV_tst)
+        self.test_gen = generator
 
         iter = self.config.test.restore_iter
         sess = tf.InteractiveSession()
@@ -349,27 +356,27 @@ class BaseTrainer(object):
             
         metric_tot = np.zeros(len(self.metric_names))
 
-        if X_tst is not None:
-            alloc_tst = np.zeros(X_tst.shape)
-            pay_tst = np.zeros(X_tst.shape[:-1])
+        if self.config.test.save_output:
+            alloc_tst = np.zeros(self.test_gen.X.shape)
+            pay_tst = np.zeros(self.test_gen.X.shape[:-1])
            
         tmp = [] #chksum           
-
         for i in range(self.config.test.num_batches):
             tic = time.time()
-            X, ADV, perm = next(self.test_gen.gen_func)
+            X, ADV, C, perm = next(self.test_gen.gen_func)
+            tmp.append(X)
             sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})
                     
             for k in range(self.config.test.gd_iter):
-                sess.run(self.test_mis_step, feed_dict = {self.x: X})
+                sess.run(self.test_mis_step, feed_dict = {self.x: X, self.c: C})
                 sess.run(self.clip_op)
 
             sess.run(self.reset_test_mis_opt)        
                 
-            metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})
+            metric_vals = sess.run(self.metrics, feed_dict = {self.x: X, self.c: C})
             
-            if X_tst is not None:
-                A, P = sess.run([self.alloc, self.pay], feed_dict = {self.x:X})
+            if self.config.test.save_output:
+                A, P = sess.run([self.alloc, self.pay], feed_dict = {self.x: X, self.c: C})
                 alloc_tst[perm, :, :] = A
                 pay_tst[perm, :] = P
                     
@@ -386,7 +393,8 @@ class BaseTrainer(object):
         log_str = "TEST ALL-%d: t = %.4f"%(iter, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
         self.logger.info(log_str)
             
-        if X_tst is not None:
+        print("DEBUG: xsum = %f"%np.array(tmp).sum())
+        if self.config.test.save_output:
             np.save(os.path.join(self.config.dir_name, 'alloc_tst_' + str(iter)), alloc_tst)
             np.save(os.path.join(self.config.dir_name, 'pay_tst_' + str(iter)), pay_tst)
             

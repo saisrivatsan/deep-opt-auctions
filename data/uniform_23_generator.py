@@ -3,8 +3,9 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-class Generator(BaseGenerator):
+from base.base_generator import BaseGenerator
 
+class Generator(BaseGenerator):
     def __init__(self, config, mode, X = None, ADV = None):
         super(Generator, self).__init__(config, mode)
         self.build_generator(X = X, ADV = ADV)

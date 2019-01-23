@@ -71,6 +71,10 @@ elif setting == "CA_sym_uniform_12":
     Generator = CA_sym_uniform_12_generator.Generator
     clip_op_lambda = (lambda x: clip_op_12(x))
     Trainer = ca12_2x2.Trainer
+
+else:
+    print("None selected")
+    sys.exit(0)
     
 
 net = Net(cfg)

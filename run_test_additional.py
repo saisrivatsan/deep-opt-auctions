@@ -62,7 +62,7 @@ elif setting == "unit_2x2_uniform":
 else:
     print("None selected")
     sys.exit(0)
-       
+
 net = Net(cfg)
 generator = Generator(cfg, 'test')
 m = Trainer(cfg, "test", net, clip_op_lambda)

@@ -78,9 +78,9 @@ __C.train.w_rgt_init_val = 5.0
 # Lagrange update frequency
 __C.train.update_frequency = 100
 # Value by which update rate is incremented-
-__C.train.up_op_add = 10.0
+__C.train.up_op_add = 50.0
 # Frequency at which update rate is incremented-
-__C.train.up_op_frequency = 1000
+__C.train.up_op_frequency = 10000
 
 
 """ train summary and save params"""

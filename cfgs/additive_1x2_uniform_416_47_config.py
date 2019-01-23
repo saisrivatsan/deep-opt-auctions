@@ -12,7 +12,7 @@ __C = edict()
 cfg = __C
 
 # Output-dir to write log-files and save model
-__C.dir_name = os.path.join("experiments", "additive_1x2_uniform_416_47_2")
+__C.dir_name = os.path.join("experiments", "additive_1x2_uniform_416_47")
 
 # Auction params
 __C.num_agents = 1
@@ -78,7 +78,7 @@ __C.train.w_rgt_init_val = 5.0
 # Lagrange update frequency
 __C.train.update_frequency = 100
 # Value by which update rate is incremented
-__C.train.up_op_add = 10.0
+__C.train.up_op_add = 20.0
 # Frequency at which update rate is incremented
 __C.train.up_op_frequency = 10000
 

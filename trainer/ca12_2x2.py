@@ -235,8 +235,8 @@ class Trainer(object):
 
             # Metrics
             welfare = tf.reduce_mean(tf.reduce_sum(self.alloc * x_in, axis = (1,2)))
-            self.metrics = [revenue, rgt_mean, irp_mean, welfare]
-            self.metric_names = ["Revenue", "Regret", "IRP", "Welfare"]
+            self.metrics = [revenue, rgt_mean, irp_mean]
+            self.metric_names = ["Revenue", "Regret", "IRP"]
             self.saver = tf.train.Saver(var_list = var_list)
             
 

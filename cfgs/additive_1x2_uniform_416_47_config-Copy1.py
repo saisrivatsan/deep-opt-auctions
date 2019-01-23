@@ -12,12 +12,12 @@ __C = edict()
 cfg = __C
 
 # Output-dir to write log-files and save model
-__C.dir_name = os.path.join("experiments", "additive_5x10_uniform")
+__C.dir_name = os.path.join("experiments", "additive_1x2_uniform_416_47")
 
 # Auction params
-__C.num_agents = 5
-__C.num_items = 10
-__C.distribution_type = "uniform"
+__C.num_agents = 1
+__C.num_items = 2
+__C.distribution_type = "asymmetric_uniform_daskalakis"
 __C.agent_type = "additive"
 
 # Save data for restore.
@@ -30,16 +30,17 @@ __C.net.init = "gu"
 # activations ["tanh", "sigmoid", "relu"]
 __C.net.activation = "tanh"
 # num_a_layers, num_p_layers - total number of hidden_layers + output_layer, [a - alloc, p - pay]
-__C.net.num_a_layers = 6
-__C.net.num_p_layers = 6
+__C.net.num_a_layers = 3
+__C.net.num_p_layers = 3
 # num_p_hidden_units, num_p_hidden_units - number of hidden units, [a - alloc, p - pay]
 __C.net.num_p_hidden_units = 100
 __C.net.num_a_hidden_units = 100
 
 # Train paramters
 __C.train = edict()
-__C.train.seed = 42 # Random seed
 
+# Random seed
+__C.train.seed = 42
 # Iter from which training begins. If restore_iter = 0 for default. restore_iter > 0 for starting
 # training form restore_iter [needs saved model]
 __C.train.restore_iter = 0
@@ -71,15 +72,15 @@ __C.train.gd_lr = 0.1
 
 """ Lagrange Optimization params """
 # Initial update rate
-__C.train.update_rate = 0.25
+__C.train.update_rate = 1.0
 # Initial Lagrange weights
-__C.train.w_rgt_init_val = 1.0
+__C.train.w_rgt_init_val = 5.0
 # Lagrange update frequency
 __C.train.update_frequency = 100
 # Value by which update rate is incremented
-__C.train.up_op_add = 0.25
+__C.train.up_op_add = 20.0
 # Frequency at which update rate is incremented
-__C.train.up_op_frequency = 100000
+__C.train.up_op_frequency = 10000
 
 
 """ train summary and save params"""

@@ -18,7 +18,7 @@ __C.dir_name = os.path.join("experiments", "CA_asym_uniform_12_15")
 __C.num_agents = 2
 __C.num_items = 2
 __C.distribution_type = "CA_asym_uniform_12_15"
-__C.agent_type = "CA"
+__C.agent_type = "additive"
 
 # Save data for restore.
 __C.save_data = False
@@ -77,9 +77,9 @@ __C.train.w_rgt_init_val = 5.0
 # Lagrange update frequency
 __C.train.update_frequency = 100
 # Value by which update rate is incremented
-__C.train.up_op_add = 10.0
+__C.train.up_op_add = 20.0
 # Frequency at which update rate is incremented
-__C.train.up_op_frequency = 1000
+__C.train.up_op_frequency = 10000
 
 
 """ Train summary and save params"""

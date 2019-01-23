@@ -13,8 +13,7 @@ from data import *
 from clip_ops.clip_ops import *
 from trainer import *
 
-print("Setting: %s"%(sys.argv[1]))
-setting = sys.argv[1]
+setting = "unit_1x2_uniform_23"
 
 if setting == "additive_1x2_uniform":
     cfg = additive_1x2_uniform_config.cfg
@@ -62,7 +61,7 @@ elif setting == "CA_asym_uniform_12_15":
     cfg = CA_asym_uniform_12_15_config.cfg
     Net = ca2x2_net.Net
     Generator = CA_asym_uniform_12_15_generator.Generator
-    clip_op_lambda = (lambda x: clip_op_12_15(x))
+    clip_op_lambda = (lambda x: clip_op_1215(x))
     Trainer = ca12_2x2.Trainer
 
 elif setting == "CA_sym_uniform_12":
@@ -71,12 +70,8 @@ elif setting == "CA_sym_uniform_12":
     Generator = CA_sym_uniform_12_generator.Generator
     clip_op_lambda = (lambda x: clip_op_12(x))
     Trainer = ca12_2x2.Trainer
-
-else:
-    print("None selected")
-    sys.exit(0)
     
 net = Net(cfg)
-generator = Generator(cfg, 'test')
-m = Trainer(cfg, "test", net, clip_op_lambda)
-m.test(generator)
+generator = [Generator(cfg, 'train'), Generator(cfg, 'val')]
+m = Trainer(cfg, "train", net, clip_op_lambda)
+m.train(generator)

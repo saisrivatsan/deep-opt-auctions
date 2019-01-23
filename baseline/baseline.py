@@ -298,7 +298,7 @@ class OptRevMultiBidders:
                 
                     return rev_VVCA/num_instances, rev_AMA_bsym/num_instances
                 
-                elif num_items > 2 and num_agents > 2:
+                elif num_items >= 2 and num_agents >= 2:
                     rev_item_myerson = 0.0
                     for i in range(num_instances):
                         for j in range(num_items):
@@ -475,3 +475,79 @@ def bundle_myserson(sample_val, rp):
 
     rev = rev/num_instances
     return rev
+
+class AscendingAuction:
+    def __init__(self, config, data):
+        self.config = config
+        self.data = data
+     
+    def find_min_overdemand(self, val, p):
+        num_agents = self.config.num_agents
+        num_items = self.config.num_items
+        
+        demand = np.zeros((num_agents, num_items))
+        matching = np.zeros((num_agents, num_items))
+        
+        for i in range(num_agents):
+            demand[i,:] = ((val[i,:] - p) == np.max(val[i,:] - p)) * (p <= np.max(val[i,:])) * 1.0
+        
+        # g = Graph(demand)
+        # num_match_item, match_item = g.maxBPM()
+        
+        min_overdemand = np.zeros(num_items)
+        if(num_items == 2):        
+            x_1 = ((demand[:,0] - demand[:,1]) > 0) * 1.0
+            x_2 = ((demand[:,1] - demand[:,0]) > 0) * 1.0
+            x_3 = (demand[:,0] == 1) * (demand[:,1] == 1) * 1.0
+            if(np.sum(x_1) >= 2):
+                min_overdemand[0] = 1.0
+                min_overdemand[1] = 0
+            elif(np.sum(x_2) >= 2):
+                min_overdemand[0] = 0
+                min_overdemand[1] = 1.0
+            elif(np.sum(x_3) >= 3):
+                min_overdemand[0] = 1.0
+                min_overdemand[1] = 1.0
+        
+        return min_overdemand
+        
+            
+    def compute_min_competitive_price(self, val):
+        eps = 0.3
+        num_agents = self.config.num_agents
+        num_items = self.config.num_items
+        p = np.zeros(num_items)
+        minimal_overdemand = self.find_min_overdemand(val, p)
+        
+        while(np.sum(minimal_overdemand) >= 1e-4):
+            p += minimal_overdemand * eps
+            minimal_overdemand = self.find_min_overdemand(val, p)
+        
+        return p
+
+    def ascending_rev(self, val):
+        p = self.compute_min_competitive_price(val)
+        num_agents = self.config.num_agents
+        num_items = self.config.num_items
+        demand = np.zeros((num_agents, num_items))
+        
+        revenue = 0.0
+        for i in range(num_agents):
+            demand[i,:] = ((val[i,:] - p) == np.max(val[i,:] - p)) * (p <= np.max(val[i,:])) * 1.0
+            if(np.sum(demand[i,:]) == 0):
+                revenue += 0.0
+            else:
+                revenue += np.sum(demand[i,:] * p)/np.sum(demand[i,:])
+        
+        return revenue
+        
+    def rev_compute_aa(self):
+        sample_val = self.data
+        num_instances = sample_val.shape[0]
+        rev_ascending_auction = 0
+        for i in range(num_instances):
+            rev_ascending_auction += self.ascending_rev(sample_val[i,:,:])
+        rev_ascending_auction = rev_ascending_auction/num_instances
+        
+        return rev_ascending_auction
+    

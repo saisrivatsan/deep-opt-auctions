@@ -1,27 +1,93 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import sys
 import numpy as np
-from cfgs.config import cfg
-from data.uniform_01_generator import Generator
+import tensorflow as tf
+
+
+from nets import *
+from cfgs import *
+from data import *
+from clip_ops.clip_ops import *
+from trainer import *
 from baseline.baseline import *
 
+print("Setting: %s"%(sys.argv[1]))
+setting = sys.argv[1]
+
+if setting == "additive_1x2_uniform":
+    cfg = additive_1x2_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("OPT: ")
+
+elif setting == "unit_1x2_uniform_23":
+    cfg = unit_1x2_uniform_23_config.cfg
+    Generator = uniform_23_generator.Generator
+    print("OPT: ")
+
+elif setting == "additive_2x2_uniform":
+    cfg = additive_2x2_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("(VVCA, AMA): ")
+
+elif setting == "additive_2x3_uniform":
+    cfg = additive_2x3_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("(I-My, B-My): ")
+
+elif setting == "additive_3x10_uniform":
+    cfg = additive_3x10_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("(I-My, B-My): ")
+    
+elif setting == "additive_5x10_uniform":
+    cfg = additive_5x10_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("(I-My, B-My): ")
+
+elif setting == "CA_asym_uniform_12_15":
+    cfg = CA_asym_uniform_12_15_config.cfg
+    Generator = CA_asym_uniform_12_15_generator.Generator
+    print("(VVCA, AMA): ")
+
+elif setting == "CA_sym_uniform_12":
+    cfg = CA_sym_uniform_12_config.cfg
+    Generator = CA_sym_uniform_12_generator.Generator
+    print("(VVCA, AMA): ")
+
+else:
+    print("None selected")
+    sys.exit(0)
+
 np.random.seed(cfg.test.seed)
-gen = Generator(mode = "test", config = cfg)
+generator = Generator(cfg, 'test')
 
-data = np.array([ next(gen.gen_func)[0] for _ in range(cfg.test.num_batches)])
-data = data.reshape(-1, cfg.num_agents, cfg.num_items)
-print("DEBUG: xsum: %f"%(data.sum()) + " xshape: " + str(data.shape))
+if not setting.startswith("CA"):
+    data = np.array([ next(generator.gen_func)[0] for _ in range(cfg.test.num_batches)])
+    data = data.reshape(-1, cfg.num_agents, cfg.num_items)
+else:
+    data = []
+    c = []
+    for i in range(cfg.test.num_batches):
+        X, ADV, C, perm = next(generator.gen_func)
+        data.append(X)
+        c.append(C)
 
-if cfg.distribution_type == "uniform" and cfg.agent_type == "additive":
-    print("Revenue (Item-wise Myerson): "),
-else:    
-    print("Revenue (Baseline): "),
+    data = np.array(data).reshape(-1, cfg.num_agents, cfg.num_items)
+    c = np.array(c).reshape(-1, cfg.num_agents)
+    x_bundle = np.sum(data, -1) + c
+    x_in = np.zeros((cfg.test.num_instances, cfg.num_agents, cfg.num_items + 1))
+    x_in[:,:,:cfg.num_items] = data
+    x_in[:,:,-1] = x_bundle    
+    data = x_in
+
 if cfg.num_agents > 1: print(OptRevMultiBidders(cfg, data).opt_rev())
 else: print(OptRevOneBidder(cfg, np.squeeze(data, 1)).opt_rev())
+    
+if setting == "additive_3x10_uniform" or setting == "additive_5x10_uniform":
+    print(bundle_myserson(data, rp = 3.92916))
+if setting == "additive_2x3_uniform":
+    print(bundle_myserson(data, rp = 1.16291)) 
 
-if cfg.distribution_type == "uniform" and cfg.agent_type == "additive":
-    """ Reserve price rp computed using Irwin-Hall distribution """    
-    if cfg.num_items == 10:
-        print("Revenue (Bundle Myerson): "),
-        print(bundle_myserson(data, rp = 3.92916))
-    elif cfg.num_items == 3:
-        print("Revenue (Bundle Myerson): "),
-        print(bundle_myserson(data, rp = 1.16291)) 

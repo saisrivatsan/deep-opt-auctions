@@ -171,10 +171,8 @@ class Trainer(object):
             with tf.variable_scope('lag_var'):
                 self.w_rgt = tf.Variable(np.ones(self.config.num_agents).astype(np.float32) * w_rgt_init_val, 'w_rgt')
 
-
             update_rate = tf.Variable(self.config.train.update_rate, trainable = False)
             self.increment_update_rate = update_rate.assign(update_rate + self.config.train.up_op_add)
-
       
             # Loss Functions
             rgt_penalty = update_rate * tf.reduce_sum(tf.square(rgt)) / 2.0        
@@ -236,8 +234,9 @@ class Trainer(object):
             self.reset_test_mis_opt = tf.variables_initializer(test_mis_opt.variables())
 
             # Metrics
-            self.metrics = [revenue, rgt_mean, irp_mean]
-            self.metric_names = ["Revenue", "Regret", "IRP"]
+            welfare = tf.reduce_mean(tf.reduce_sum(self.alloc * x_in, axis = (1,2)))
+            self.metrics = [revenue, rgt_mean, irp_mean, welfare]
+            self.metric_names = ["Revenue", "Regret", "IRP", "Welfare"]
             self.saver = tf.train.Saver(var_list = var_list)
             
 
@@ -359,12 +358,10 @@ class Trainer(object):
         if self.config.test.save_output:
             alloc_tst = np.zeros(self.test_gen.X.shape)
             pay_tst = np.zeros(self.test_gen.X.shape[:-1])
-           
-        tmp = [] #chksum           
+                    
         for i in range(self.config.test.num_batches):
             tic = time.time()
             X, ADV, C, perm = next(self.test_gen.gen_func)
-            tmp.append(X)
             sess.run(self.assign_op, feed_dict = {self.adv_init: ADV})
                     
             for k in range(self.config.test.gd_iter):
@@ -393,7 +390,6 @@ class Trainer(object):
         log_str = "TEST ALL-%d: t = %.4f"%(iter, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
         self.logger.info(log_str)
             
-        print("DEBUG: xsum = %f"%np.array(tmp).sum())
         if self.config.test.save_output:
             np.save(os.path.join(self.config.dir_name, 'alloc_tst_' + str(iter)), alloc_tst)
             np.save(os.path.join(self.config.dir_name, 'pay_tst_' + str(iter)), pay_tst)

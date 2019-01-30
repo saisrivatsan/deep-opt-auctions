@@ -1,0 +1,62 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import numpy as np
+import tensorflow as tf
+
+from base.base_net import *
+
+class Net(BaseNet):
+
+    def __init__(self, config):
+        super(Net, self).__init__(config)
+        self.build_net()
+
+    def build_net(self):
+        """
+        Initializes network variables
+        """
+
+        assert(self.config.num_agents == 1)
+        num_items = self.config.num_items
+        num_hidden_units = self.config.net.num_hidden_units
+        
+        w_init = self.init
+        b_init = tf.keras.initializers.Zeros()
+
+        wd = None if "wd" not in self.config.train else self.config.train.wd
+        
+        with tf.variable_scope("utility"):
+           
+            # Input Layer
+            self.alpha = create_var("alpha", [num_agents, num_hidden_units], initializer = w_init, wd = wd)
+
+            # Biases
+            self.b = create_var("b", [num_hidden_units], initializer = b_init))
+ 
+        
+
+    def inference(self, x):
+        """
+        Inference
+        Args:
+            x: [num_instances, num_items]
+        """
+ 
+      
+        w = tf.nn.sigmoid(self.alpha)
+        v = tf.tile(tf.expand_dims(x, -1), [1, 1, num_hidden_units])
+
+        menus = tf.matmul(x, alpha) + self.b
+        utility = tf.nn.softmax(menus, -1)        
+        if self.mode == "train":
+            alloc =  tf.tile(tf.expand_dims(alpha, 0), [num_instances, 1, 1]
+            pay = tf.reduce_sum(tf.multiply(alloc, v), axis = -1) - utility
+            
+        
+        if self.mode == "train":
+            pay = tf.reduce_sum(tf.multiply(pay, utility_softmax))
+        else:
+           pay = tf.reduce_sum(tf.multiply(pay, 
+        return a, p

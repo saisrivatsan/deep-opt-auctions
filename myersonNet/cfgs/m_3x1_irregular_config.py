@@ -12,12 +12,12 @@ __C = edict()
 cfg = __C
 
 # Output-dir to write log-files and save model
-__C.dir_name = os.path.join("experiments", "additive_1x2_uniform_04_03")
+__C.dir_name = os.path.join("experiments", "m_3x1_irregular")
 
 # Auction params
-__C.num_items = 2
-__C.distribution_type = "asymmetric_uniform_04_03"
-__C.agent_type = "additive"
+__C.num_agents = 3
+__C.distribution_type = "irregular"
+
 
 # Save data for restore.
 __C.save_data = False
@@ -25,11 +25,11 @@ __C.save_data = False
 """ Neural Net parameter """
 __C.net = edict()    
 # Init
-__C.net.b_init = [-7.0, 0.0]
-# num_hidden_units
-__C.net.num_hidden_units = 1000
-# soft-max constant for smooth argmax approximation
-__C.config.net.eps = 1e3
+__C.net.b_init = [-1.0, 0.0]
+# Num max units
+__C.net.num_max_units = 10
+# Num func
+__C.net.num_func = 10
 
 
 """ Train paramters """
@@ -49,7 +49,7 @@ __C.train.wd = None
 
 
 """ Train-data params """
-# Choose between fixed and online. If online, set adv_reuse to False
+# Choose between fixed and online.
 __C.train.data = "fixed"
 # Number of batches
 __C.train.num_batches = 5000
@@ -60,18 +60,18 @@ __C.train.batch_size = 128
 """ train summary and save params"""
 # Number of models to store on disk
 __C.train.max_to_keep = 4
-# Frequency at which models are saved-
+# Frequency at which models are saved
 __C.train.save_iter = 100000
 # Train stats print frequency
-__C.train.print_iter = 10000
+__C.train.print_iter = 1000
    
 
 """ Validation params """
 __C.val = edict()
-# Number of validation batches
+# Number of batches
 __C.val.num_batches = 100
 # Frequency at which validation is performed
-__C.val.print_iter = 10000
+__C.val.print_iter = 1000
 # Validation data
 __C.val.data = "fixed"
 

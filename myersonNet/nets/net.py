@@ -5,6 +5,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
+
 def create_var(name, shape, dtype = tf.float32, initializer = None, wd = None, summaries = False, trainable = True):
     """ 
     Helper to create a Variable and summary if required
@@ -67,33 +68,51 @@ class Net:
         Initializes network variables
         """
 
-        num_items = self.config.num_items
-        num_hidden_units = self.config.net.num_hidden_units       
+        num_func = self.config.net.num_func
+        num_max_units = self.config.net.num_max_units
+        num_agents = self.config.num_agents
+            
         wd = None if "wd" not in self.config.train else self.config.train.wd
-        
-        
-        with tf.variable_scope("utility"):
-            self.alpha = create_var("alpha", [num_items + 1, num_hidden_units], initializer = self.w_init, wd = wd)            
-            self.bias = create_var("bias", [num_hidden_units], initializer = self.b_init)
+               
+        with tf.variable_scope("myersonNet"):
+            self.w = create_var("w", [1, num_max_units, num_func, num_agents], initializer = self.w_init, wd = wd)
+            self.b = create_var("b", [1, num_max_units, num_func, num_agents], initializer = self.b_init, wd = wd)
 
-
+            
     def inference(self, x):
         """
         Inference
         """
-        padding_w = tf.constant([[0, 0], [0, 1]])
-        padding_b = tf.constant([[0, 1]])
-
-        w = tf.slice(tf.nn.softmax(self.alpha, 0), [0, 0], [self.config.num_items, -1])
-        w = tf.pad(w, padding_w, "CONSTANT")
-        b = tf.pad(self.bias, padding_b, "CONSTANT")
-
-        utility = tf.matmul(x, w) + b
-        U = tf.nn.softmax(utility * self.config.net.eps, -1)
-        if self.mode is "train":
-            a = tf.matmul(U, tf.transpose(w))
-        else:
-            a = tf.matmul(tf.one_hot(tf.argmax(utility, -1), self.config.net.num_hidden_units + 1), tf.transpose(w))
-        p = tf.reduce_sum(tf.multiply(a, x), -1) - tf.reduce_max(utility, -1)
         
-        return a, p
+        num_func = self.config.net.num_func
+        num_max_units = self.config.net.num_max_units
+        num_agents = self.config.num_agents
+        
+        batch_size = self.config[self.mode].batch_size
+                
+        W = tf.tile(self.w, [batch_size, 1, 1, 1])
+        B = tf.tile(self.b, [batch_size, 1, 1, 1])
+        
+        x = tf.tile(x[:, tf.newaxis, tf.newaxis, :], [1, num_max_units, num_func, 1])                    
+        vv = tf.reduce_min(tf.reduce_max(tf.multiply(x, tf.exp(W)) + B, axis = 2), axis = 1)
+        
+        a = tf.pad(vv, [[0,0],[0,1]], "CONSTANT")
+        if self.mode is 'train':
+            a = tf.nn.softmax(a * 1e3, axis = -1)
+        if self.mode is 'test':
+            a = tf.one_hot(tf.argmax(a, axis = -1), num_agents + 1)        
+        a = tf.slice(a, [0, 0], [-1, num_agents])
+        
+                        
+        wp = tf.matrix_diag(np.float32(np.ones((num_agents, num_agents)) - np.identity(num_agents)))
+
+        y = tf.tile(vv[tf.newaxis, :, :], [num_agents, 1, 1])                        
+        y = tf.matmul(y, wp)
+        y = tf.transpose(tf.reduce_max(y, axis = 2))
+        
+        ## Decode the payment
+        y = tf.tile(y[:, tf.newaxis, tf.newaxis, :], [1, num_max_units, num_func, 1])
+        p = tf.reduce_max(tf.reduce_min(tf.multiply(y - B, 1 / tf.exp(W)), axis = 2), axis = 1)
+        p = tf.multiply(a, p)
+                    
+        return a, p, vv

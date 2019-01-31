@@ -28,6 +28,8 @@ __C.net = edict()
 __C.net.b_init = [-1.0, 0.0]
 # num_hidden_units
 __C.net.num_hidden_units = 1000
+# soft-max constant for smooth argmax approximation
+__C.config.net.eps = 1e3
 
 
 """ Train paramters """
@@ -58,7 +60,7 @@ __C.train.batch_size = 128
 """ train summary and save params"""
 # Number of models to store on disk
 __C.train.max_to_keep = 4
-# Frequency at which models are saved-
+# Frequency at which models are saved
 __C.train.save_iter = 100000
 # Train stats print frequency
 __C.train.print_iter = 10000
@@ -66,11 +68,11 @@ __C.train.print_iter = 10000
 
 """ Validation params """
 __C.val = edict()
-# Number of steps for misreport computation
+# Number of validation batches
 __C.val.num_batches = 100
 # Frequency at which validation is performed
 __C.val.print_iter = 10000
-# Validation data frequency
+# Validation data
 __C.val.data = "fixed"
 
 """ Test params """
@@ -80,7 +82,7 @@ __C.test = edict()
 __C.test.seed = 100
 # Model to be evaluated
 __C.test.restore_iter = 400000
-# Number of misreports
+# Test data
 __C.test.data = "online"
 # Number of test batches
 __C.test.num_batches = 100

@@ -5,8 +5,6 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from base.base_net import *
-
 def create_var(name, shape, dtype = tf.float32, initializer = None, wd = None, summaries = False, trainable = True):
     """ 
     Helper to create a Variable and summary if required
@@ -90,7 +88,7 @@ class Net:
         b = tf.pad(self.bias, padding_b, "CONSTANT")
 
         utility = tf.matmul(x, w) + b
-        U = tf.nn.softmax(utility * 1e3, -1)
+        U = tf.nn.softmax(utility * self.config.net.eps, -1)
         if self.mode is "train":
             a = tf.matmul(U, tf.transpose(w))
         else:

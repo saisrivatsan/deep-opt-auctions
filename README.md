@@ -1,6 +1,6 @@
 # Optimal Auctions through Deep Learning
 
-###Required Packages
+### Required Packages
 
 1. Python 2.7 
 1. Tensorflow

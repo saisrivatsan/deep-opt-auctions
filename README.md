@@ -19,7 +19,7 @@ cd regretNet
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 python run_train.py [setting_name]
-python run_train.py [setting_name]
+python run_test.py [setting_name]
 python run_baseline.py [setting_name]
 ```
 
@@ -37,7 +37,7 @@ setting\_no  |      setting\_name |
  For additional experiments in the appendix, run:
  ```
 python run_train_additional.py [setting_name]
-python run_train_additional.py [setting_name]
+python run_test_additional.py [setting_name]
 python run_baseline_additional.py [setting_name]
 ```
 

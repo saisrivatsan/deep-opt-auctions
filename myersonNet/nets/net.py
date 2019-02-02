@@ -75,8 +75,8 @@ class Net:
         wd = None if "wd" not in self.config.train else self.config.train.wd
                
         with tf.variable_scope("myersonNet"):
-            self.w = create_var("w", [1, num_max_units, num_func, num_agents], initializer = self.w_init, wd = wd)
-            self.b = create_var("b", [1, num_max_units, num_func, num_agents], initializer = self.b_init, wd = wd)
+            self.w = create_var("w", [num_max_units, num_func, num_agents], initializer = self.w_init, wd = wd)
+            self.b = create_var("b", [num_max_units, num_func, num_agents], initializer = self.b_init, wd = wd)
 
             
     def inference(self, x):
@@ -90,29 +90,29 @@ class Net:
         
         batch_size = self.config[self.mode].batch_size
                 
-        W = tf.tile(self.w, [batch_size, 1, 1, 1])
-        B = tf.tile(self.b, [batch_size, 1, 1, 1])
+        W = tf.tile(self.w[tf.newaxis, ...], [batch_size, 1, 1, 1])
+        B = tf.tile(self.b[tf.newaxis, ...], [batch_size, 1, 1, 1])        
+        x = tf.tile(x[:, tf.newaxis, tf.newaxis, :], [1, num_max_units, num_func, 1])   
         
-        x = tf.tile(x[:, tf.newaxis, tf.newaxis, :], [1, num_max_units, num_func, 1])                    
         vv = tf.reduce_min(tf.reduce_max(tf.multiply(x, tf.exp(W)) + B, axis = 2), axis = 1)
         
         a = tf.pad(vv, [[0,0],[0,1]], "CONSTANT")
         if self.mode is 'train':
-            a = tf.nn.softmax(a * 1e3, axis = -1)
+            a = tf.nn.softmax(a * self.config.net.eps, axis = -1)
         if self.mode is 'test':
             a = tf.one_hot(tf.argmax(a, axis = -1), num_agents + 1)        
         a = tf.slice(a, [0, 0], [-1, num_agents])
         
                         
         wp = tf.matrix_diag(np.float32(np.ones((num_agents, num_agents)) - np.identity(num_agents)))
-
-        y = tf.tile(vv[tf.newaxis, :, :], [num_agents, 1, 1])                        
-        y = tf.matmul(y, wp)
-        y = tf.transpose(tf.reduce_max(y, axis = 2))
+        y = tf.tile(vv[tf.newaxis, :, :], [num_agents, 1, 1]) 
+        y = tf.matmul(y, wp)      
+        y = tf.transpose(tf.reduce_max(y, axis = -1))
+        y = tf.nn.relu(y)
         
         ## Decode the payment
         y = tf.tile(y[:, tf.newaxis, tf.newaxis, :], [1, num_max_units, num_func, 1])
-        p = tf.reduce_max(tf.reduce_min(tf.multiply(y - B, 1 / tf.exp(W)), axis = 2), axis = 1)
+        p = tf.reduce_max(tf.reduce_min(tf.multiply(y - B, tf.exp(-W)), axis = 2), axis = 1)
         p = tf.multiply(a, p)
                     
         return a, p, vv

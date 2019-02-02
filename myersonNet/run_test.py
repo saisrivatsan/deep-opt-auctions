@@ -15,55 +15,27 @@ from trainer import *
 print("Setting: %s"%(sys.argv[1]))
 setting = sys.argv[1]
 
-
-if setting == "additive_1x2_uniform":
-    cfg = additive_1x2_uniform_config.cfg
-    Net = additive_net.Net
-    Generator = uniform_01_generator.Generator
-    Trainer = trainer.Trainer
+if setting == "uniform":
+    cfg = m_3x1_sym_uniform_01_config.cfg
+    Generator = sym_uniform_01.Generator
     
-elif setting == "additive_1x2_uniform_416_47":
-    cfg = additive_1x2_uniform_416_47_config.cfg
-    Net = additive_net.Net
-    Generator = uniform_416_47_generator.Generator
-    Trainer = trainer.Trainer
+elif setting == "asymmetric_uniform":
+    cfg = m_5x1_asym_uniform_config.cfg
+    Generator = asym_uniform.Generator
     
-elif setting == "additive_1x2_uniform_04_03":
-    cfg = additive_1x2_uniform_04_03_config.cfg
-    Net = additive_net.Net
-    Generator = uniform_04_03_generator.Generator
-    Trainer = trainer.Trainer
+elif setting == "exponential":
+    cfg = m_3x1_exp_3_config.cfg
+    Generator = exp_3.Generator
     
-elif setting == "additive_1x2_uniform_triangle":
-    cfg = additive_1x2_uniform_triangle_config.cfg
-    Net = additive_net.Net
-    Generator = uniform_triangle_01_generator.Generator
-    Trainer = trainer.Trainer
-
-elif setting == "additive_1x10_uniform":
-    cfg = additive_1x10_uniform_config.cfg
-    Net = additive_net.Net
-    Generator = uniform_01_generator.Generator
-    Trainer = trainer.Trainer
-
-elif setting == "unit_1x2_uniform":
-    cfg = unit_1x2_uniform_config.cfg
-    Net = unit_net.Net
-    Generator = uniform_01_generator.Generator
-    Trainer = trainer.Trainer
-     
-elif setting == "unit_1x2_uniform_23":
-    cfg = unit_1x2_uniform_23_config.cfg
-    Net = unit_net.Net
-    Generator = uniform_23_generator.Generator
-    Trainer = trainer.Trainer
+elif setting == "irregular":
+    cfg = m_3x1_irregular_config.cfg
+    Generator = irregular_03_38.Generator
     
 else:
     print("None selected")
     sys.exit(0)
     
-
-net = Net(cfg, "test")
-generator = Generator(cfg, 'test')
-m = Trainer(cfg, "test", net)
+net = net.Net(cfg, "test")
+generator = Generator(cfg, "test")
+m = trainer.Trainer(cfg, "test", net)
 m.test(generator)

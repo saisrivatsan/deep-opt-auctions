@@ -16,7 +16,7 @@ __C.dir_name = os.path.join("experiments", "m_3x1_sym_uniform_01")
 
 # Auction params
 __C.num_agents = 3
-__C.distribution_type = "sym_uniform"
+__C.distribution_type = "uniform"
 
 
 # Save data for restore.
@@ -25,11 +25,13 @@ __C.save_data = False
 """ Neural Net parameter """
 __C.net = edict()    
 # Init
-__C.net.b_init = [-5.0, 0.0]
+__C.net.b_init = [-1.0, 0.0]
 # Num max units
 __C.net.num_max_units = 10
 # Num func
 __C.net.num_func = 10
+# soft-max constant for smooth argmax approximation
+__C.net.eps = 1e3
 
 
 """ Train paramters """
@@ -41,7 +43,7 @@ __C.train.seed = 42
 # training form restore_iter [needs saved model]
 __C.train.restore_iter = 0
 # max iters to train 
-__C.train.max_iter = 400000
+__C.train.max_iter = 40000
 # Learning rate of network param updates
 __C.train.learning_rate = 1e-3
 # Regularization
@@ -61,7 +63,7 @@ __C.train.batch_size = 128
 # Number of models to store on disk
 __C.train.max_to_keep = 4
 # Frequency at which models are saved
-__C.train.save_iter = 100000
+__C.train.save_iter = 40000
 # Train stats print frequency
 __C.train.print_iter = 10000
    
@@ -81,7 +83,7 @@ __C.test = edict()
 # Test Seed
 __C.test.seed = 100
 # Model to be evaluated
-__C.test.restore_iter = 400000
+__C.test.restore_iter = 40000
 # Test data
 __C.test.data = "online"
 # Number of test batches

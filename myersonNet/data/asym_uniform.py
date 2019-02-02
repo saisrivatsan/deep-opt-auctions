@@ -13,5 +13,5 @@ class Generator(BaseGenerator):
     def generate_random_X(self, shape):
         X = np.zeros(shape)
         for i in range(shape[1]):
-            X[:, i] = np.random.rand(shape[0]) * (i + 1)
+            X[:, i] = np.random.uniform(0.0, i + 1, size = shape[0])
         return X

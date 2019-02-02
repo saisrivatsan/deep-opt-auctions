@@ -29,9 +29,7 @@ __C.net.b_init = [-10.0, 0.0]
 # num_hidden_units
 __C.net.num_hidden_units = 1000
 # soft-max constant for smooth argmax approximation
-__C.config.net.eps = 1e3
-# soft-max constant for smooth argmax approximation
-__C.config.net.eps = 1e3
+__C.net.eps = 1e3
 
 
 """ Train paramters """
@@ -43,7 +41,7 @@ __C.train.seed = 42
 # training form restore_iter [needs saved model]
 __C.train.restore_iter = 0
 # max iters to train 
-__C.train.max_iter = 400000
+__C.train.max_iter = 200000
 # Learning rate of network param updates
 __C.train.learning_rate = 1e-3
 # Regularization
@@ -83,7 +81,7 @@ __C.test = edict()
 # Test Seed
 __C.test.seed = 100
 # Model to be evaluated
-__C.test.restore_iter = 400000
+__C.test.restore_iter = 200000
 # Test data
 __C.test.data = "online"
 # Number of test batches

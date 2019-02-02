@@ -207,18 +207,18 @@ class Trainer(object):
 
         if self.config.test.save_output:
             alloc_tst = np.zeros(self.test_gen.X.shape)
-            pay_tst = np.zeros(self.test_gen.X.shape[:-1])
+            pay_tst = np.zeros(self.test_gen.X.shape)
             vv_tst = np.zeros(self.test_gen.X.shape)
                     
         for i in range(self.config.test.num_batches):
             tic = time.time()
-            X = next(self.test_gen.gen_func)    
+            X = next(self.test_gen.gen_func)  
             metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})          
             if self.config.test.save_output:
                 A, P, VV = sess.run([self.alloc, self.pay, self.vv], feed_dict = {self.x:X})
                 perm =range(i * A.shape[0], (i + 1) * A.shape[0])
                 alloc_tst[perm, :] = A
-                pay_tst[perm] = P
+                pay_tst[perm, :] = P
                 vv_tst[perm, :] = VV
                     
             metric_tot += metric_vals
@@ -226,8 +226,8 @@ class Trainer(object):
             time_elapsed += (toc - tic)
 
             fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_vals) for item in tup ])
-            log_str = "TEST BATCH-%d: t = %.4f"%(i, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
-            self.logger.info(log_str)
+            #log_str = "TEST BATCH-%d: t = %.4f"%(i, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
+            #self.logger.info(log_str)
         
         metric_tot = metric_tot/self.config.test.num_batches
         fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_tot) for item in tup ])
@@ -239,6 +239,5 @@ class Trainer(object):
             np.save(os.path.join(self.config.dir_name, 'pay_tst_' + str(iter)), pay_tst)
             np.save(os.path.join(self.config.dir_name, 'vv_tst_' + str(iter)), vv_tst)
             
-        
         
         

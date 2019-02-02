@@ -6,11 +6,9 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-
-from nets import *
 from cfgs import *
 from data import *
-from trainer import *
+from baseline.baseline import *
 
 print("Setting: %s"%(sys.argv[1]))
 setting = sys.argv[1]
@@ -35,7 +33,9 @@ else:
     print("None selected")
     sys.exit(0)
     
-net = net.Net(cfg, "train")
-generator = [Generator(cfg, 'train'), Generator(cfg, 'val')]
-m = trainer.Trainer(cfg, "train", net)
-m.train(generator)
+np.random.seed(cfg.test.seed)
+generator = Generator(cfg, 'test')
+
+data = np.array([ next(generator.gen_func) for _ in range(cfg.test.num_batches)])
+data = data.reshape(-1, cfg.num_agents)
+print(OptRevOneItem(cfg, data).opt_rev())

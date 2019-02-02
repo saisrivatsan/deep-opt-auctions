@@ -226,8 +226,8 @@ class Trainer(object):
             time_elapsed += (toc - tic)
 
             fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_vals) for item in tup ])
-            log_str = "TEST BATCH-%d: t = %.4f"%(i, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
-            self.logger.info(log_str)
+            #log_str = "TEST BATCH-%d: t = %.4f"%(i, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
+            #self.logger.info(log_str)
         
         metric_tot = metric_tot/self.config.test.num_batches
         fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_tot) for item in tup ])

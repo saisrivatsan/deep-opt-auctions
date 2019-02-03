@@ -11,8 +11,7 @@ Install the following packages:
 
 ### Running Experiments in the paper
 
-Default hyperparameters specified in cfgs/
-
+Default hyperparameters specified in regretNet/cfgs/
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd regretNet
@@ -51,6 +50,8 @@ python run_baseline_additional.py [setting_name]
 
 ### Running single bidder auctions using RochetNet
 
+Default hyperparameters specified in rochetNet/cfgs/
+For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd rochetNet
 python run_train.py [setting_name]
@@ -68,7 +69,9 @@ setting\_no  |      setting\_name |
   (g)   |   unit\_1x2\_uniform\_23
   
   ### Running single item auctions using MyersonNet
-
+  
+Default hyperparameters specified in myersonNet/cfgs/
+For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd myersonNet
 python run_train.py [setting_name]

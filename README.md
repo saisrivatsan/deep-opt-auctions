@@ -117,6 +117,6 @@ setting\_no  |      setting\_name |
 
 Allocation Probabilty plot for **additive\_1x2\_uniform** setting learnt by regret:
 
-<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc1.png" width="200"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc2.png" width="200">
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc2.png" width="300">
 
 For other allocation probability plots, check-out the ipython notebook in `regretNet` or `rochetNet` folder.

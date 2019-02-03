@@ -115,11 +115,11 @@ setting\_no  |      setting\_name |
 
 ## Visualization
 
-Allocation Probabilty plot for **additive\_1x2\_uniform** setting learnt by regretNet:
+Allocation Probabilty plots for **additive\_1x2\_uniform** setting learnt by **regretNet**:
 
 <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/additive_1x2_uniform_alloc2.png" width="300">
 
-Allocation Probabilty plot for **additive\_1x2\_uniform\_416\_47** setting learnt by rochetNet:
+Allocation Probabilty plots for **additive\_1x2\_uniform\_416\_47** setting learnt by **rochetNet**:
 
 <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc2.png" width="300">
 

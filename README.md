@@ -1,7 +1,8 @@
 # Optimal Auctions through Deep Learning
 
-### Required Packages
+### Getting Started
 
+Install the following packages
 - Python 2.7 
 - Tensorflow
 - Numpy and Matplotlib packages

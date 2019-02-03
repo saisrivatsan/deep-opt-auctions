@@ -66,7 +66,7 @@ setting\_no  |      setting\_name |
   (f)   |   unit\_1x2\_uniform
   (g)   |   unit\_1x2\_uniform\_23
   
-  ### Running single item auctions using RochetNet
+  ### Running single item auctions using MyersonNet
 
 ```
 cd myersonNet

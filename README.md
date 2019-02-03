@@ -85,10 +85,7 @@ setting\_no  |      setting\_name |
   \(c\) |   exponential
   (d)   |   irregular
  
----
-## Results
-
-### Settings
+## Settings
 - **additive\_1x2\_uniform**: A single bidder with additive valuations over two items, where the items is drawn from U\[0, 1\].
 
 - **unit\_1x2\_uniform\_23**: A single bidder with unit-demand valuations over two items, where the item values are drawn from U\[2, 3
@@ -115,3 +112,11 @@ setting\_no  |      setting\_name |
 - **additive\_1x2\_uniform\_04\_03**: A Single additive bidder with preferences over two items, where the item values v<sub>1</sub> ∼ U\[0, 4], v<sub>2</sub> ∼ U\[0, 3]
 
 - **unit\_2x2\_uniform**: Two unit-demand bidders and two items, where the bidders draw their value for each item from identical U\[0, 1\].
+
+## Visualization
+
+Allocation Probabilty plot for **unit\_1x2\_uniform\_23** setting:
+
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc1.png" width="200"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc2.png" width="200">
+
+For other allocation probability plots, check-out the ipython notebook in `regretNet` or `rochetNet` folder.

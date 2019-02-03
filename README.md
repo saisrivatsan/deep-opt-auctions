@@ -10,14 +10,11 @@
 
 ### Running Experiments in the paper
 
-To run experiments in the paper with with default hyperparameters specified in cfgs/
-
-```
-cd regretNet
-```
+Default hyperparameters specified in cfgs/
 
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
+cd regretNet
 python run_train.py [setting_name]
 python run_test.py [setting_name]
 python run_baseline.py [setting_name]
@@ -55,9 +52,6 @@ python run_baseline_additional.py [setting_name]
 
 ```
 cd rochetNet
-```
-For training the network, testing the mechanism learnt and computing the baselines, run:
-```
 python run_train.py [setting_name]
 python run_test.py [setting_name]
 python run_baseline.py [setting_name]
@@ -76,9 +70,6 @@ setting\_no  |      setting\_name |
 
 ```
 cd myersonNet
-```
-For training the network, testing the mechanism learnt and computing the baselines, run:
-```
 python run_train.py [setting_name]
 python run_test.py [setting_name]
 python run_baseline.py [setting_name]

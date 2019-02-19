@@ -1,4 +1,5 @@
-# Optimal Auctions through Deep Learning (https://arxiv.org/pdf/1706.03459.pdf)
+# Optimal Auctions through Deep Learning
+Implementation of "Optimal Auctions through Deep Learning" (https://arxiv.org/pdf/1706.03459.pdf)
 
 ### Getting Started
 

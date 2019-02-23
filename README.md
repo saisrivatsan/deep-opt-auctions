@@ -1,4 +1,5 @@
 # Optimal Auctions through Deep Learning
+Implementation of "Optimal Auctions through Deep Learning" (https://arxiv.org/pdf/1706.03459.pdf)
 
 ### Getting Started
 
@@ -123,3 +124,15 @@ Allocation Probabilty plots for **additive\_1x2\_uniform\_416\_47** setting lear
 <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc2.png" width="300">
 
 For other allocation probability plots, check-out the ipython notebooks in `regretNet` or `rochetNet` folder.
+
+## Reference
+
+Please cite our work if you find our code/paper is useful to your work.
+```
+@article{DFNP17,
+  author    = {Paul D{\"{u}}tting and Zhe Feng and Harikrishna Narasimhan and David C. Parkes},
+  title     = {Optimal Auctions through Deep Learning},
+  journal   = {arXiv preprint arXiv:1706.03459},
+  year      = {2017},
+}
+```

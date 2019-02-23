@@ -120,13 +120,13 @@ class Trainer(object):
             
             
         # Misreports
-        x_mis, misreports = self.get_misreports(self.x, self.adv_var, adv_shape)
+        x_mis, self.misreports = self.get_misreports(self.x, self.adv_var, adv_shape)
         
         # Get mechanism for true valuation: Allocation and Payment
         self.alloc, self.pay = self.net.inference(self.x)
         
         # Get mechanism for misreports: Allocation and Payment
-        a_mis, p_mis = self.net.inference(misreports)
+        a_mis, p_mis = self.net.inference(self.misreports)
         
         # Utility
         utility = self.compute_utility(self.x, self.alloc, self.pay)

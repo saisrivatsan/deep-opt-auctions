@@ -50,6 +50,7 @@ elif setting == "unit_2x2_uniform":
 else:
     print("None selected")
     sys.exit(0)
+    
 
 np.random.seed(cfg.test.seed)
 generator = Generator(cfg, 'test')   

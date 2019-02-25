@@ -83,6 +83,7 @@ else:
     x_in[:,:,-1] = x_bundle    
     data = x_in
 
+
 if cfg.num_agents > 1: print(OptRevMultiBidders(cfg, data).opt_rev())
 else: print(OptRevOneBidder(cfg, np.squeeze(data, 1)).opt_rev())
     

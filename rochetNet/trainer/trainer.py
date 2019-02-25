@@ -213,7 +213,7 @@ class Trainer(object):
                     
         for i in range(self.config.test.num_batches):
             tic = time.time()
-            X = next(self.test_gen.gen_func)    
+            X = next(self.test_gen.gen_func)
             metric_vals = sess.run(self.metrics, feed_dict = {self.x: X})          
             if self.config.test.save_output:
                 A, P = sess.run([self.alloc, self.pay], feed_dict = {self.x:X})
@@ -233,7 +233,6 @@ class Trainer(object):
         fmt_vals = tuple([ item for tup in zip(self.metric_names, metric_tot) for item in tup ])
         log_str = "TEST ALL-%d: t = %.4f"%(iter, time_elapsed) + ", %s: %.6f"*len(self.metric_names)%fmt_vals
         self.logger.info(log_str)
-            
         if self.config.test.save_output:
             np.save(os.path.join(self.config.dir_name, 'alloc_tst_' + str(iter)), alloc_tst)
             np.save(os.path.join(self.config.dir_name, 'pay_tst_' + str(iter)), pay_tst)

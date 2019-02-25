@@ -78,7 +78,7 @@ __C.train.w_rgt_init_val = 5.0
 # Lagrange update frequency
 __C.train.update_frequency = 100
 # Value by which update rate is incremented
-__C.train.up_op_add = 20.0
+__C.train.up_op_add = 5.0
 # Frequency at which update rate is incremented
 __C.train.up_op_frequency = 10000
 
@@ -109,7 +109,7 @@ __C.val.data = "fixed"
 # Test set
 __C.test = edict()
 # Test Seed
-__C.test.seed = 100
+__C.test.seed = 2 
 # Model to be evaluated
 __C.test.restore_iter = 400000
 # Number of misreports

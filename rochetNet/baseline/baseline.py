@@ -54,10 +54,10 @@ class OptRevOneBidder:
                     for i in range(num_instances):
                         x1 = sample_val[i, 0]
                         x2 = sample_val[i, 1]
-                        if x1 + x2 <= 0.5:
+                        if x1 + x2 <= np.sqrt(1.0/3.0):
                             revenue += 0
                         else:
-                            revenue += 0.5
+                            revenue += np.sqrt(1.0/3.0)
                             
                     revenue = revenue/num_instances
                     return(revenue)

@@ -74,17 +74,9 @@ setting\_no  |      setting\_name |
 Default hyperparameters specified in myersonNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
-cd myersonNet
-python run_train.py [setting_name]
-python run_test.py [setting_name]
-python run_baseline.py [setting_name]
+cd MyersonNet
+bash myerson.sh
 ```
-setting\_no  |      setting\_name |
- :---:  | :---: |
-  (a)   |  uniform |
-  (b)   |   asymmetric_uniform
-  \(c\) |   exponential
-  (d)   |   irregular
  
 ## Settings
 - **additive\_1x2\_uniform**: A single bidder with additive valuations over two items, where the items is drawn from U\[0, 1\].

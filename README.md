@@ -71,12 +71,19 @@ setting\_no  |      setting\_name |
   
 ### Running single item auctions using MyersonNet
   
-Default hyperparameters specified in myersonNet/cfgs/.  
+Default hyperparameters specified in utils/cfg.py.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd MyersonNet
-bash myerson.sh
+python main.py -distr [setting_name]
 ```
+setting\_no  |      setting\_name |
+ :---:  | :---: |
+  (a)   |  exponential 
+  (b)   |   uniform
+  \(c\) |   asymmetric\_uniform 
+  (d)   |   irregular
+
  
 ## Settings
 - **additive\_1x2\_uniform**: A single bidder with additive valuations over two items, where the items is drawn from U\[0, 1\].

@@ -117,11 +117,11 @@ setting\_no  |      setting\_name |
 
 Allocation Probabilty plots for **unit\_1x2\_uniform_23** setting learnt by **regretNet**:
 
-<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc2.png" width="300">
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc1.pdf" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/unit_1x2_uniform_23_alloc2.pdf" width="300">
 
 Allocation Probabilty plots for **additive\_1x2\_uniform\_416\_47** setting learnt by **rochetNet**:
 
-<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc2.png" width="300">
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc1.pdf" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/additive_1x2_uniform_416_47_alloc2.pdf" width="300">
 
 For other allocation probability plots, check-out the ipython notebooks in `regretNet` or `rochetNet` folder.
 

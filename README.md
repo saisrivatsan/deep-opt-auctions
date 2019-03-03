@@ -23,30 +23,19 @@ python run_baseline.py [setting_name]
 
 setting\_no  |      setting\_name |
  :---:   | :---: |
-  (I)    |  additive\_1x2\_uniform |
-  (II)   | unit\_1x2\_uniform\_23 |
-  (III)  | additive\_2x2\_uniform |
-  (IV)   | CA\_sym\_uniform\_12 |
-  (V)    | CA\_asym\_uniform\_12\_15 |
-  (VI)   | additive\_3x10\_uniform |
-  (VII)  | additive\_5x10\_uniform |
-  
-
- For additional experiments, run:
- ```
-python run_train_additional.py [setting_name]
-python run_test_additional.py [setting_name]
-python run_baseline_additional.py [setting_name]
-```
-
- setting\_no  |      setting\_name |
- :---:   | :---: |
-  (a) |   additive\_1x2\_uniform\_416\_47
-  (b) |   additive\_1x2\_uniform\_triangle
-  \(c\) |   unit\_1x2\_uniform
-  (d) |  additive\_1x10\_uniform
-  (e) |   additive\_1x2\_uniform\_04\_03
-  (f) |   unit\_2x2\_uniform
+  (a)    |  additive\_1x2\_uniform |
+  (b)   | unit\_1x2\_uniform\_23 |
+  (c\)  | additive\_2x2\_uniform |
+  (d)   | CA\_sym\_uniform\_12 |
+  (e)    | CA\_asym\_uniform\_12\_15 |
+  (f)   | additive\_3x10\_uniform |
+  (g)  | additive\_5x10\_uniform |
+  (h) |   additive\_1x2\_uniform\_416\_47
+  (i) |   additive\_1x2\_uniform\_triangle
+  (j) |   unit\_1x2\_uniform
+  (k) |  additive\_1x10\_uniform
+  (l) |   additive\_1x2\_uniform\_04\_03
+  (m) |   unit\_2x2\_uniform
 
 
 ### Running single bidder auctions using RochetNet

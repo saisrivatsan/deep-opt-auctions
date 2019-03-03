@@ -10,7 +10,7 @@ Install the following packages:
 - Easydict - `pip install easydict`
 
 
-### Running Experiments in the paper
+### Running Experiments using RegretNet (Gradient-based approach)
 
 Default hyperparameters specified in regretNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
@@ -32,7 +32,7 @@ setting\_no  |      setting\_name |
   (VII)  | additive\_5x10\_uniform |
   
 
- For additional experiments in the appendix, run:
+ For additional experiments, run:
  ```
 python run_train_additional.py [setting_name]
 python run_test_additional.py [setting_name]

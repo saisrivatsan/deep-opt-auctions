@@ -57,6 +57,36 @@ elif setting == "CA_sym_uniform_12":
     Generator = CA_sym_uniform_12_generator.Generator
     print("(VVCA, AMA): ")
 
+elif setting == "additive_1x2_uniform_416_47":
+    cfg = additive_1x2_uniform_416_47_config.cfg
+    Generator = uniform_416_47_generator.Generator
+    print("OPT: ")
+
+elif setting == "additive_1x2_uniform_triangle":
+    cfg = additive_1x2_uniform_triangle_config.cfg
+    Generator = uniform_triangle_01_generator.Generator
+    print("OPT: ")
+    
+elif setting == "unit_1x2_uniform":
+    cfg = unit_1x2_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("OPT: ")
+
+elif setting == "additive_1x10_uniform":
+    cfg = additive_1x10_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("(I-My, B-My): ")
+    
+elif setting == "additive_1x2_uniform_04_03":
+    cfg = additive_1x2_uniform_04_03_config.cfg
+    Generator = uniform_04_03_generator.Generator
+    print("(I-My, B-My): ")
+
+elif setting == "unit_2x2_uniform":
+    cfg = unit_2x2_uniform_config.cfg
+    Generator = uniform_01_generator.Generator
+    print("AA: ")
+    
 else:
     print("None selected")
     sys.exit(0)
@@ -84,9 +114,11 @@ else:
     data = x_in
 
 
-if cfg.num_agents > 1: print(OptRevMultiBidders(cfg, data).opt_rev())
+if setting == "unit_2x2_uniform":
+    print(AscendingAuction(cfg, data).rev_compute_aa())
+elif cfg.num_agents > 1: print(OptRevMultiBidders(cfg, data).opt_rev())
 else: print(OptRevOneBidder(cfg, np.squeeze(data, 1)).opt_rev())
-    
+   
 if setting == "additive_3x10_uniform" or setting == "additive_5x10_uniform":
     print(bundle_myserson(data, rp = 3.92916))
 if setting == "additive_2x3_uniform":

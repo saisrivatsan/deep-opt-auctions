@@ -74,8 +74,9 @@ setting\_no  |      setting\_name |
 Default hyperparameters specified in utils/cfg.py.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
-cd MyersonNet
-python main.py -distr [setting_name]
+cd myersonNet
+python main.py -distr [setting_name] or
+bash myerson.sh
 ```
 setting\_no  |      setting\_name |
  :---:  | :---: |

@@ -25,7 +25,7 @@ Modify hyperparameters in the config file specified in regretNet/cfg/.
 ```
 cfg.train.gd_iter = 0
 cfg.train.num_misreports = 100
-cfg.val.num_misreports = 100 # Number of val-misreports is always equal to number of train-misreports
+cfg.val.num_misreports = 100 # Number of val-misreports is always equal to the number of train-misreports
 ```
 
 For training the network, testing the mechanism learnt and computing the baselines, run:

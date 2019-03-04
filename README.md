@@ -1,7 +1,7 @@
 # Optimal Auctions through Deep Learning
 Implementation of "Optimal Auctions through Deep Learning" (https://arxiv.org/pdf/1706.03459.pdf)
 
-### Getting Started
+## Getting Started
 
 Install the following packages:
 - Python 2.7 
@@ -9,8 +9,11 @@ Install the following packages:
 - Numpy and Matplotlib packages
 - Easydict - `pip install easydict`
 
+---
 
-### Running Experiments using RegretNet (Gradient-based approach)
+## Running the experiments
+
+### RegretNet (Gradient-based approach)
 
 Default hyperparameters specified in regretNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
@@ -38,7 +41,7 @@ setting\_no  |      setting\_name |
   (m) |   unit\_2x2\_uniform
 
 
-### Running single bidder auctions using RochetNet
+### RochetNet
 
 Default hyperparameters specified in rochetNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
@@ -58,7 +61,7 @@ setting\_no  |      setting\_name |
   (f)   |   unit\_1x2\_uniform
   (g)   |   unit\_1x2\_uniform\_23
   
-### Running single item auctions using MyersonNet
+### MyersonNet
   
 Default hyperparameters specified in utils/cfg.py.  
 For training the network, testing the mechanism learnt and computing the baselines, run:

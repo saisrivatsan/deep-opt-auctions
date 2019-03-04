@@ -13,9 +13,20 @@ Install the following packages:
 
 ## Running the experiments
 
-### RegretNet (Gradient-based approach)
+### RegretNet
 
-Default hyperparameters specified in regretNet/cfgs/.  
+
+#### For Gradient-Based approach:
+Default hyperparameters are specified in regretNet/cfgs/.  
+
+#### For Sample-Based approach:
+Modify hyperparameters in the corresponding config file specified in regretNet/cfg/.
+```
+cfg.train.gd_iter = 0
+cfg.train.num_misreports = 100
+cfg.val.num_misreports = 100 # Number of val-misreports is always equal to number of train-misreports
+```
+
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd regretNet
@@ -43,7 +54,7 @@ setting\_no  |      setting\_name |
 
 ### RochetNet (Single Bidder Auctions)
 
-Default hyperparameters specified in rochetNet/cfgs/.  
+Default hyperparameters are specified in rochetNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd rochetNet
@@ -63,7 +74,7 @@ setting\_no  |      setting\_name |
   
 ### MyersonNet (Single Item Auctions)
   
-Default hyperparameters specified in utils/cfg.py.  
+Default hyperparameters are specified in utils/cfg.py.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
 ```
 cd myersonNet

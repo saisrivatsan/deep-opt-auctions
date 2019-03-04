@@ -41,7 +41,7 @@ setting\_no  |      setting\_name |
   (m) |   unit\_2x2\_uniform
 
 
-### RochetNet
+### RochetNet (Single Bidder Auctions)
 
 Default hyperparameters specified in rochetNet/cfgs/.  
 For training the network, testing the mechanism learnt and computing the baselines, run:
@@ -61,7 +61,7 @@ setting\_no  |      setting\_name |
   (f)   |   unit\_1x2\_uniform
   (g)   |   unit\_1x2\_uniform\_23
   
-### MyersonNet
+### MyersonNet (Single Item Auctions)
   
 Default hyperparameters specified in utils/cfg.py.  
 For training the network, testing the mechanism learnt and computing the baselines, run:

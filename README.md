@@ -21,7 +21,7 @@ Install the following packages:
 Default hyperparameters are specified in regretNet/cfgs/.  
 
 #### For Sample-Based approach:
-Modify hyperparameters in the config file specified in regretNet/cfg/.
+Modify the following hyperparameters in the config file specified in regretNet/cfg/.
 ```
 cfg.train.gd_iter = 0
 cfg.train.num_misreports = 100

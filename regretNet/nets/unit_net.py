@@ -76,12 +76,12 @@ class Net(BaseNet):
             self.w_p.append(create_var("w_p_0", [num_in, num_p_hidden_units], initializer = w_init, wd = wd))
 
             # Hidden Layers
-            for i in range(1, num_a_layers - 1):
+            for i in range(1, num_p_layers - 1):
                 wname = "w_p_" + str(i)
                 self.w_p.append(create_var(wname, [num_p_hidden_units, num_p_hidden_units], initializer = w_init, wd = wd))
                 
             # Output Layer
-            wname = "w_p_" + str(num_a_layers - 1)   
+            wname = "w_p_" + str(num_p_layers - 1)   
             self.w_p.append(create_var(wname, [num_p_hidden_units, num_agents], initializer = w_init, wd = wd))
 
             # Biases

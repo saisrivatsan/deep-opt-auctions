@@ -1,8 +1,6 @@
 # Optimal Auctions through Deep Learning
 Implementation of "Optimal Auctions through Deep Learning" (https://arxiv.org/pdf/1706.03459.pdf)
 
----
-
 ## Getting Started
 
 Install the following packages:
@@ -10,8 +8,6 @@ Install the following packages:
 - Tensorflow
 - Numpy and Matplotlib packages
 - Easydict - `pip install easydict`
-
----
 
 ## Running the experiments
 
@@ -89,8 +85,6 @@ setting\_no  |      setting\_name |
   \(c\) |   asymmetric\_uniform 
   (d)   |   irregular
 
----
-
  
 ## Settings
 
@@ -124,7 +118,6 @@ setting\_no  |      setting\_name |
 
 - **additive\_5x10\_uniform**: 5 additive bidders and 10 items, where bidders draw their value for each item from U\[0, 1\].
 
----
 
 ## Visualization
 
@@ -138,7 +131,6 @@ Allocation Probabilty plots for **additive\_1x2\_uniform\_416\_47** setting lear
 
 For other allocation probability plots, check-out the ipython notebooks in `regretNet` or `rochetNet` folder.
 
----
 
 ## Reference
 

@@ -136,10 +136,10 @@ For other allocation probability plots, check-out the ipython notebooks in `regr
 
 Please cite our work if you find our code/paper is useful to your work.
 ```
-@article{DFNP17,
-  author    = {Paul D{\"{u}}tting and Zhe Feng and Harikrishna Narasimhan and David C. Parkes},
+@article{DFNP19,
+  author    = {Paul D{\"{u}}tting and Zhe Feng and Harikrishna Narasimhan and David C. Parkes and Sai Srivatsa Ravindranath},
   title     = {Optimal Auctions through Deep Learning},
   journal   = {arXiv preprint arXiv:1706.03459},
-  year      = {2017},
+  year      = {2019},
 }
 ```

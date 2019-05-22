@@ -343,6 +343,7 @@ class Trainer(object):
         metric_tot = np.zeros(len(self.metric_names))
 
         if self.config.test.save_output:
+            assert(hasattr(generator, "X")), "save_output option only allowed when config.test.data = Fixed or when X is passed as an argument to the generator"
             alloc_tst = np.zeros(self.test_gen.X.shape)
             pay_tst = np.zeros(self.test_gen.X.shape[:-1])
                     

@@ -64,6 +64,6 @@ else:
     
 
 net = Net(cfg, "test")
-generator = Generator(cfg, 'test', data)
+generator = Generator(cfg, 'test')
 m = Trainer(cfg, "test", net)
 m.test(generator)

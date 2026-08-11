@@ -1,145 +1,283 @@
-# Optimal Auctions through Deep Learning
-Implementation of "Optimal Auctions through Deep Learning" (https://arxiv.org/pdf/1706.03459.pdf)
+# WastefulSybilNet
 
-## Getting Started
+This repository is being extended into a research framework for learning and auditing revenue-maximizing **Sybil-proof, potentially wasteful single-item auctions**. The new work builds on the original implementation of [Optimal Auctions through Deep Learning](https://arxiv.org/pdf/1706.03459.pdf), which remains in the repository as the historical baseline.
 
-Install the following packages:
-- Python 2.7 
-- Tensorflow
-- Numpy and Matplotlib packages
-- Easydict - `pip install easydict`
+The repository currently contains the original MyersonNet, RegretNet, and RochetNet code. The planned `sybilnet/` implementation has not been added yet. The first development milestone is to build and verify the mathematical mechanism layer before introducing a general neural allocation architecture.
 
-## Running the experiments
+## Research direction
+
+The original MyersonNet learns one fixed-population auction. Sybil-proofness instead compares a family of mechanisms across population sizes: a bidder participating once in $M_n$ must not gain by replacing its identity with multiple reports in $M_{n+1}, M_{n+2}, \ldots$.
+
+The first model class will be the discounted Tullock contest success function (DCSF) family. For $n$ reported identities,
+
+$$
+a_i^n(b)=\Gamma_n\tau_i^{k_n}(b),
+\qquad
+\Gamma_n=\prod_{j=1}^n C_j,
+$$
+
+where, for $k_n>0$,
+
+$$
+\tau_i^{k_n}(b)=\frac{b_i^{k_n}}{\sum_j b_j^{k_n}}.
+$$
+
+The initial learnable mechanism parameters will be the discrimination sequence $k_n$ and stitching factors $C_n$. Allocation will be implemented in log space for numerical stability. Incentive-compatible payments will be computed from the envelope formula with differentiable Gauss-Legendre quadrature rather than learned by a payment network.
+
+For a bidder of value $v_i$ that replaces one report with two Sybil reports $x,y$, the local constraint compares
+
+$$
+U_{\mathrm{one}}^n(v_i;b_{-i})
+\quad\text{with}\quad
+U_{\mathrm{split}}^{n+1}(v_i;x,y,b_{-i}).
+$$
+
+The training adversary will optimize $x,y$ to find profitable splits. A separate worst-case auditor will also optimize the genuine value and surrounding rival profile. This separation is important: low regret on samples from a value distribution is empirical evidence, while an analytically enforced bound is what supports a certification claim.
+
+## Planned implementation
+
+The new implementation will use modern Python and PyTorch and will live alongside, rather than modify, the historical TensorFlow code.
+
+```text
+sybilnet/
+├── config.py
+├── mechanisms/
+│   ├── base.py
+│   ├── dcsf.py
+│   └── soh.py
+├── payments/
+│   └── envelope.py
+├── adversaries/
+│   ├── local_split.py
+│   └── worst_case.py
+├── training/
+│   ├── losses.py
+│   └── trainer.py
+├── evaluation/
+│   ├── audit.py
+│   └── stitching_frontier.py
+└── distributions.py
+
+tests/
+├── test_dcsf.py
+├── test_envelope.py
+├── test_local_split.py
+├── test_paper_bounds.py
+└── test_soh.py
+```
+
+### Development stages
+
+1. **Fixed-mechanism verification**
+   - Implement DCSF allocations for fixed $k_n,C_n$.
+   - Implement normalized envelope payments using deterministic quadrature.
+   - Verify feasibility, monotonicity, payment identities, and analytical special cases.
+
+2. **Local Sybil adversary**
+   - Search over two-identity splits for every $n\rightarrow n+1$.
+   - Combine random restarts with boundary attacks derived from the paper.
+   - Evaluate with substantially stronger attacks than those used during training.
+
+3. **Learn stitching factors**
+   - Hold $k_n$ fixed and optimize $C_n$ for revenue subject to local Sybil-regret constraints.
+   - Compare learned stitching thresholds with exact, sufficient, and explicit upper bounds.
+
+4. **Joint mechanism optimization**
+   - Learn nondecreasing $k_n$ jointly with $C_n$.
+   - Use alternating adversary and mechanism updates with an augmented-Lagrangian objective.
+   - Track revenue together with mean, tail, maximum, and relative Sybil regret.
+
+5. **Theorem and application experiments**
+   - Reproduce the lottery stitching sequence and attacks.
+   - Reproduce the Sydney Opera House revenue identity.
+   - Estimate and plot stitching frontiers.
+   - Use the auditor to search for counterexamples and guide new conjectures.
+
+Only after this structured mechanism family is validated will the project consider richer symmetric monotone neural allocation models.
+
+## Modern development setup
+
+The new SybilNet work targets **Python 3.14.6**. The root [`requirements.txt`](requirements.txt) pins the current stable package versions selected for the first implementation milestone.
+
+Create an isolated environment and install the dependencies:
+
+```bash
+python3.14 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+On Windows PowerShell, activate the environment with:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+The root requirements install the standard PyPI build of PyTorch. For a platform-specific CUDA or accelerator build, use the command generated by the [official PyTorch installer](https://pytorch.org/get-started/locally/) and then install the remaining requirements.
+
+The modern dependencies are:
+
+- PyTorch for differentiable mechanisms and nested adversarial optimization.
+- NumPy and SciPy for numerical routines and independent validation.
+- Matplotlib for revenue, regret, allocation, and stitching-frontier plots.
+- PyYAML for experiment configuration.
+- pytest for theorem-derived unit and property tests.
+
+The legacy code is not expected to run in this modern environment without a separate port.
+
+## Historical implementations
+
+The original repository implements three constructions from *Optimal Auctions through Deep Learning*:
+
+| Component | Setting | Truthfulness approach |
+| --- | --- | --- |
+| `myersonNet/` | Multiple bidders, one item | Monotone virtual-value transformations and critical payments |
+| `rochetNet/` | One bidder, multiple items | Convex utility represented as a learned menu |
+| `regretNet/` | Multiple bidders, multiple items | Adversarial misreports and empirical regret penalties |
+
+MyersonNet provides the architectural lesson that economic guarantees should be encoded into the mechanism. RegretNet provides the main historical reference for adversarial report optimization and augmented-Lagrangian training. The new framework will reimplement these ideas in PyTorch because the original execution stack is obsolete.
+
+## Legacy setup and requirements
+
+The historical experiments were written for:
+
+- Python 2.7
+- TensorFlow 1.x
+- NumPy
+- Matplotlib
+- EasyDict (`pip install easydict`)
+
+These requirements are intentionally not included in the root `requirements.txt`: TensorFlow 1.x and Python 2.7 cannot share the modern environment used by the planned code. Reproducing the historical experiments requires a separate legacy environment or container.
+
+The legacy entry points also use unqualified imports, so run them from within their respective subdirectories as shown below.
+
+## Running the legacy experiments
 
 ### RegretNet
 
-#### For Gradient-Based approach:
-Default hyperparameters are specified in regretNet/cfgs/.  
+Default hyperparameters are specified in `regretNet/cfgs/`.
 
-#### For Sample-Based approach:
-Modify the following hyperparameters in the config file specified in regretNet/cfg/.
-```
+For the gradient-based approach, use the defaults for the selected experiment. For the sample-based approach, modify these values in the relevant configuration file:
+
+```python
 cfg.train.gd_iter = 0
 cfg.train.num_misreports = 100
-cfg.val.num_misreports = 100 # Number of val-misreports is always equal to the number of train-misreports
+cfg.val.num_misreports = 100
 ```
 
-For training the network, testing the mechanism learnt and computing the baselines, run:
-```
+Train the network, test the learned mechanism, and compute baselines with:
+
+```bash
 cd regretNet
 python run_train.py [setting_name]
 python run_test.py [setting_name]
 python run_baseline.py [setting_name]
 ```
 
-setting\_no  |      setting\_name |
- :---:   | :---: |
-  (a)    |  additive\_1x2\_uniform |
-  (b)   | unit\_1x2\_uniform\_23 |
-  (c\)  | additive\_2x2\_uniform |
-  (d)   | CA\_sym\_uniform\_12 |
-  (e)    | CA\_asym\_uniform\_12\_15 |
-  (f)   | additive\_3x10\_uniform |
-  (g)  | additive\_5x10\_uniform |
-  (h) |   additive\_1x2\_uniform\_416\_47
-  (i) |   additive\_1x2\_uniform\_triangle
-  (j) |   unit\_1x2\_uniform
-  (k) |  additive\_1x10\_uniform
-  (l) |   additive\_1x2\_uniform\_04\_03
-  (m) |   unit\_2x2\_uniform
+Available settings:
 
+| Setting | Name |
+| --- | --- |
+| (a) | `additive_1x2_uniform` |
+| (b) | `unit_1x2_uniform_23` |
+| (c) | `additive_2x2_uniform` |
+| (d) | `CA_sym_uniform_12` |
+| (e) | `CA_asym_uniform_12_15` |
+| (f) | `additive_3x10_uniform` |
+| (g) | `additive_5x10_uniform` |
+| (h) | `additive_1x2_uniform_416_47` |
+| (i) | `additive_1x2_uniform_triangle` |
+| (j) | `unit_1x2_uniform` |
+| (k) | `additive_1x10_uniform` |
+| (l) | `additive_1x2_uniform_04_03` |
+| (m) | `unit_2x2_uniform` |
 
-### RochetNet (Single Bidder Auctions)
+### RochetNet
 
-Default hyperparameters are specified in rochetNet/cfgs/.  
-For training the network, testing the mechanism learnt and computing the baselines, run:
-```
+Default hyperparameters are specified in `rochetNet/cfgs/`.
+
+```bash
 cd rochetNet
 python run_train.py [setting_name]
 python run_test.py [setting_name]
 python run_baseline.py [setting_name]
 ```
-setting\_no  |      setting\_name |
- :---:  | :---: |
-  (a)   |  additive\_1x2\_uniform |
-  (b)   |   additive\_1x2\_uniform\_416\_47
-  \(c\) |   additive\_1x2\_uniform\_triangle
-  (d)   |   additive\_1x2\_uniform\_04\_03
-  (e)   |  additive\_1x10\_uniform
-  (f)   |   unit\_1x2\_uniform
-  (g)   |   unit\_1x2\_uniform\_23
-  
-### MyersonNet (Single Item Auctions)
-  
-Default hyperparameters are specified in utils/cfg.py.  
-For training the network, testing the mechanism learnt and computing the baselines, run:
-```
+
+Available settings:
+
+| Setting | Name |
+| --- | --- |
+| (a) | `additive_1x2_uniform` |
+| (b) | `additive_1x2_uniform_416_47` |
+| (c) | `additive_1x2_uniform_triangle` |
+| (d) | `additive_1x2_uniform_04_03` |
+| (e) | `additive_1x10_uniform` |
+| (f) | `unit_1x2_uniform` |
+| (g) | `unit_1x2_uniform_23` |
+
+### MyersonNet
+
+Default hyperparameters are specified in `myersonNet/utils/cfg.py`.
+
+```bash
 cd myersonNet
-python main.py -distr [setting_name] or
+python main.py -distr [setting_name]
+# or run every configured experiment:
 bash myerson.sh
 ```
-setting\_no  |      setting\_name |
- :---:  | :---: |
-  (a)   |  exponential 
-  (b)   |   uniform
-  \(c\) |   asymmetric\_uniform 
-  (d)   |   irregular
 
- 
-## Settings
+Available settings are `uniform`, `exponential`, `asymmetric_uniform`, and `irregular`.
 
-### Single Bidder
-- **additive\_1x2\_uniform**: A single bidder with additive valuations over two items, where the items is drawn from U\[0, 1\].
+## Legacy experiment settings
 
-- **unit\_1x2\_uniform\_23**: A single bidder with unit-demand valuations over two items, where the item values are drawn from U\[2, 3\].
+### Single bidder
 
-- **additive\_1x2\_uniform\_416\_47**: Single additive bidder with preferences over two non-identically distributed items, where v<sub>1</sub> ∼ U\[4, 16\]and v<sub>2</sub> ∼ U\[4, 7\].
+- **`additive_1x2_uniform`**: one additive bidder and two items, with both item values drawn from $U[0,1]$.
+- **`unit_1x2_uniform_23`**: one unit-demand bidder and two items, with values drawn from $U[2,3]$.
+- **`additive_1x2_uniform_416_47`**: one additive bidder with $v_1\sim U[4,16]$ and $v_2\sim U[4,7]$.
+- **`additive_1x2_uniform_triangle`**: one additive bidder with $(v_1,v_2)$ uniform on the triangle with vertices $(0,0),(0,1),(1,0)$.
+- **`unit_1x2_uniform`**: one unit-demand bidder and two items, with values drawn from $U[0,1]$.
+- **`additive_1x2_uniform_04_03`**: one additive bidder with $v_1\sim U[0,4]$ and $v_2\sim U[0,3]$.
+- **`additive_1x10_uniform`**: one additive bidder and ten items, with each value drawn from $U[0,1]$.
 
-- **additive\_1x2\_uniform\_triangle**: A single additive bidder with preferences over two items, where (v<sub>1</sub>, v<sub>2</sub>) are drawn jointly and uniformly from a unit-triangle with vertices (0, 0), (0, 1) and (1, 0).
+### Multiple bidders
 
-- **unit\_1x2\_uniform**: A single unit-demand bidder with preferences over two items, where the item values from U\[0, 1\]
-
-- **additive\_1x2\_uniform\_04\_03**: A Single additive bidder with preferences over two items, where the item values v<sub>1</sub> ∼ U\[0, 4], v<sub>2</sub> ∼ U\[0, 3]
-
-- **additive\_1x10\_uniform**: A single additive bidder and 10 items, where bidders draw their value for each item from U\[0, 1\].
-
-### Multiple Bidders
-- **additive\_2x2\_uniform**: Two additive bidders and two items, where bidders draw their value for each item from U\[0, 1\]. 
-
-- **unit\_2x2\_uniform**: Two unit-demand bidders and two items, where the bidders draw their value for each item from identical U\[0, 1\].
-
-- **additive\_2x3\_uniform**: Two additive bidders and three items, where bidders draw their value for each item from U\[0, 1\]. 
-
-- **CA\_sym\_uniform\_12**: Two bidders and two items, with v<sub>1,1</sub>, v<sub>1,2</sub>, v<sub>2,1</sub>, v<sub>2,2</sub> ∼ U\[1, 2\], v<sub>1,{1,2}</sub> = v<sub>1,1</sub> + v<sub>1,2</sub> + C<sub>1</sub> and v<sub>2,{1,2}</sub> = v<sub>2,1</sub> + v<sub>2,2</sub> + C<sub>2</sub>, where C<sub>1</sub>, C<sub>2</sub> ∼ U\[−1, 1\].
-
-- **CA\_asym\_uniform\_12\_15**: Two bidders and two items, with v<sub>1,1</sub>, v<sub>1,2</sub> ∼ U\[1, 2\], v<sub>2,1</sub>, v<sub>2,2</sub> ∼ U\[1, 5\], v<sub>1,{1,2}</sub> = v<sub>1,1</sub> + v<sub>1,2</sub> + C<sub>1</sub> and v<sub>2,{1,2}</sub> = v<sub>2,1</sub> + v<sub>2,2</sub> + C<sub>2</sub>, where C<sub>1</sub>, C<sub>2</sub> ∼ U\[−1, 1].
-
-- **additive\_3x10\_uniform**: 3 additive bidders and 10 items, where bidders draw their value for each item from U\[0, 1\].
-
-- **additive\_5x10\_uniform**: 5 additive bidders and 10 items, where bidders draw their value for each item from U\[0, 1\].
-
+- **`additive_2x2_uniform`**: two additive bidders and two items, with values drawn independently from $U[0,1]$.
+- **`unit_2x2_uniform`**: two unit-demand bidders and two items, with values drawn independently from $U[0,1]$.
+- **`additive_2x3_uniform`**: two additive bidders and three items, with values drawn independently from $U[0,1]$.
+- **`CA_sym_uniform_12`**: two bidders and two items. Singleton values are drawn from $U[1,2]$, and each bundle value is the sum of singleton values plus $C_i\sim U[-1,1]$.
+- **`CA_asym_uniform_12_15`**: bidder 1 singleton values are drawn from $U[1,2]$, bidder 2 singleton values from $U[1,5]$, and each bundle value adds $C_i\sim U[-1,1]$.
+- **`additive_3x10_uniform`**: three additive bidders and ten items, with values drawn independently from $U[0,1]$.
+- **`additive_5x10_uniform`**: five additive bidders and ten items, with values drawn independently from $U[0,1]$.
 
 ## Visualization
 
-Allocation Probabilty plots for **unit\_1x2\_uniform_23** setting learnt by **regretNet**:
+Allocation probability plots for the `unit_1x2_uniform_23` RegretNet setting:
 
-<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/visualization/unit_1x2_uniform_23_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/visualization/unit_1x2_uniform_23_alloc2.png" width="300">
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/visualization/unit_1x2_uniform_23_alloc1.png" width="300" alt="RegretNet allocation probability for item 1"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/regretNet/plots/visualization/unit_1x2_uniform_23_alloc2.png" width="300" alt="RegretNet allocation probability for item 2">
 
-Allocation Probabilty plots for **additive\_1x2\_uniform\_416\_47** setting learnt by **rochetNet**:
+Allocation probability plots for the `additive_1x2_uniform_416_47` RochetNet setting:
 
-<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/visualization/additive_1x2_uniform_416_47_alloc1.png" width="300"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/visualization/additive_1x2_uniform_416_47_alloc2.png" width="300">
+<img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/visualization/additive_1x2_uniform_416_47_alloc1.png" width="300" alt="RochetNet allocation probability for item 1"> <img src="https://github.com/saisrivatsan/deep-opt-auctions/blob/master/rochetNet/plots/visualization/additive_1x2_uniform_416_47_alloc2.png" width="300" alt="RochetNet allocation probability for item 2">
 
-For other allocation probability plots, check-out the ipython notebooks in `regretNet` or `rochetNet` folder.
+Additional allocation plots are available in the notebooks under `regretNet/` and `rochetNet/`.
 
+## Reference for the historical code
 
-## Reference
+Please cite the original work when using the MyersonNet, RegretNet, or RochetNet implementation:
 
-Please cite our work if you find our code/paper is useful to your work.
-```
+```bibtex
 @article{DFNP19,
-  author    = {Paul D{\"{u}}tting and Zhe Feng and Harikrishna Narasimhan and David C. Parkes and Sai Srivatsa Ravindranath},
-  title     = {Optimal Auctions through Deep Learning},
-  journal   = {arXiv preprint arXiv:1706.03459},
-  year      = {2019},
+  author  = {Paul D{\"{u}}tting and Zhe Feng and Harikrishna Narasimhan and David C. Parkes and Sai Srivatsa Ravindranath},
+  title   = {Optimal Auctions through Deep Learning},
+  journal = {arXiv preprint arXiv:1706.03459},
+  year    = {2019}
 }
 ```
+
+Citation information for the Sybil-proof mechanism work will be added when the paper metadata is finalized.
+
+## License
+
+See [`LICENSE`](LICENSE).

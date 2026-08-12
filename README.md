@@ -2,7 +2,7 @@
 
 This repository is being extended into a research framework for learning and auditing revenue-maximizing **Sybil-proof, potentially wasteful single-item auctions**. The new work builds on the original implementation of [Optimal Auctions through Deep Learning](https://arxiv.org/pdf/1706.03459.pdf), which remains in the repository as the historical baseline.
 
-The repository currently contains the original MyersonNet, RegretNet, and RochetNet code. The planned `sybilnet/` implementation has not been added yet. The first development milestone is to build and verify the mathematical mechanism layer before introducing a general neural allocation architecture.
+The repository contains the original MyersonNet, RegretNet, and RochetNet code. New work lives in `wasteNet/`; the name deliberately avoids `sybilNet`, which is already associated with another paper. The first development milestone is to build and verify the mathematical mechanism layer before introducing a general neural allocation architecture.
 
 ## Research direction
 
@@ -34,12 +34,18 @@ $$
 
 The training adversary will optimize $x,y$ to find profitable splits. A separate worst-case auditor will also optimize the genuine value and surrounding rival profile. This separation is important: low regret on samples from a value distribution is empirical evidence, while an analytically enforced bound is what supports a certification claim.
 
+### Current implementation status
+
+The first primitive is implemented in `wasteNet/mechanisms/tullock.py`. It follows Definition 2.1 of the working paper and provides a differentiable, log-space Tullock contest function with an exact uniform lottery at $k=0$ and for all-zero bid profiles. This function returns the undiscounted contest shares $\tau^k$; the cumulative waste factor from Definition 2.2 will be a separate mechanism layer. Its mathematical and numerical behavior is covered by `tests/test_tullock.py`.
+
+For $k>0$ with every rival bid equal to zero, Definition 2.1 assigns share $1/n$ at an own bid of exactly zero and share $1$ at every positive own bid. This single endpoint does not affect the envelope integral. The future payment implementation will nevertheless use open Gauss-Legendre nodes and explicitly test this boundary so numerical quadrature does not give the endpoint artificial weight.
+
 ## Planned implementation
 
 The new implementation will use modern Python and PyTorch and will live alongside, rather than modify, the historical TensorFlow code.
 
 ```text
-sybilnet/
+wasteNet/
 ├── config.py
 ├── mechanisms/
 │   ├── base.py
@@ -97,7 +103,7 @@ Only after this structured mechanism family is validated will the project consid
 
 ## Modern development setup
 
-The new SybilNet work targets **Python 3.14.6**. The root [`requirements.txt`](requirements.txt) pins the current stable package versions selected for the first implementation milestone.
+The new WasteNet work targets **Python 3.14.6**. The root [`requirements.txt`](requirements.txt) pins the current stable package versions selected for the first implementation milestone.
 
 Create an isolated environment and install the dependencies:
 
@@ -125,6 +131,26 @@ The modern dependencies are:
 - pytest for theorem-derived unit and property tests.
 
 The legacy code is not expected to run in this modern environment without a separate port.
+
+### Running the modern tests
+
+After activating the modern virtual environment and installing `requirements.txt`, run the complete test suite from the repository root:
+
+```bash
+python -m pytest
+```
+
+Run only the Tullock CSF tests with:
+
+```bash
+python -m pytest tests/test_tullock.py -v
+```
+
+Run one named boundary test while developing with:
+
+```bash
+python -m pytest tests/test_tullock.py::test_all_zero_rivals_have_paper_defined_endpoint_jump -v
+```
 
 ## Historical implementations
 

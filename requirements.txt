@@ -1,4 +1,4 @@
-# Modern SybilNet development environment (Python 3.14.6)
+# Modern WasteNet development environment (Python 3.14.6)
 # The historical TensorFlow 1.x code requires a separate Python 2.7 environment.
 torch==2.13.0
 numpy==2.5.1
